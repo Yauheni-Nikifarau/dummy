@@ -9,13 +9,23 @@ class Trip extends Model
 {
     use HasFactory;
 
-    public function tagAssigns()
+    public function orders()
     {
-        return $this->hasMany(TagAssign::class);
+        return $this->hasMany(Order::class);
     }
 
-    public function order()
+    public function discount()
     {
-        return $this->hasOne(Order::class);
+        return $this->belongsTo(Discount::class);
+    }
+
+    public function hotel()
+    {
+        return $this->belongsTo(Hotel::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Trip::class, 'tags_assigns', 'tag_id', 'trip_id');
     }
 }
