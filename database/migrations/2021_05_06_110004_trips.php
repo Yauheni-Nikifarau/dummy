@@ -24,6 +24,7 @@ class Trips extends Migration
             $table->char('meal_option', 2);
             $table->boolean('reservation')->default(false);
             $table->foreignId('discount_id')->nullable();
+            $table->string('image')->nullable();
             $table->foreign('hotel_id')->references('id')->on('hotels')->onDelete('set null');
             $table->foreign('discount_id')->references('id')->on('discounts')->onDelete('set null');
             $table->timestamps();
