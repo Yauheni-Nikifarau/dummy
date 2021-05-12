@@ -33,7 +33,7 @@ class TripFactory extends Factory
             'meal_option' => $this->faker->randomElement(['OB', 'HB', 'FB', 'BB', 'AI']),
             'reservation' => false,
             'discount_id' => $this->faker->numberBetween(1,5),
-            'image' => $this->faker->image(storage_path(), 300, 300, 'travel')
+            'image' => $this->faker->image(storage_path('app/public/tripsWallpapers'), 300, 300, 'travel')
         ];
     }
 }
