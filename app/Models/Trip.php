@@ -16,7 +16,10 @@ class Trip extends Model
 
     public function discount()
     {
-        return $this->belongsTo(Discount::class);
+        return $this->belongsTo(Discount::class)->withDefault([
+            'value' => 0,
+            'name' => null
+        ]);
     }
 
     public function hotel()
@@ -24,8 +27,8 @@ class Trip extends Model
         return $this->belongsTo(Hotel::class);
     }
 
-    public function tags()
+    public function tagsAssigns()
     {
-        return $this->belongsToMany(Trip::class, 'tags_assigns', 'tag_id', 'trip_id');
+        return $this->hasMany(TagsAssign::class);
     }
 }

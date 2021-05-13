@@ -3,13 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\OrderResource;
-use App\Models\Order;
+use App\Http\Resources\MessageResource;
+use App\Models\Message;
 use Illuminate\Http\Request;
 
-
-
-class OrderController extends Controller
+class MessageController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,7 +16,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        return (new OrderResource(Order::with('trip', 'user')->get()))->manyOrders();
+        return (new MessageResource(Message::with('from', 'to')->get()))->manyMessages();
     }
 
     /**
@@ -40,7 +38,7 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        return (new OrderResource(Order::with('trip', 'user')->find($id)))->oneOrder();
+        return (new MessageResource(Message::with('from', 'to')->find($id)))->oneMessage();
     }
 
     /**

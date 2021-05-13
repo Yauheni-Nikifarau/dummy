@@ -12,11 +12,14 @@ class TripController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function index()
     {
-        return new TripResource(Trip::all());
+        return (new TripResource(Trip::with(['hotel', 'discount', 'tagsAssigns'])
+                ->where('reservation', '=', 0)
+                ->get()))
+                ->manyTrips();
     }
 
     /**
@@ -34,11 +37,11 @@ class TripController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function show($id)
     {
-        return new TripResource(Trip::find($id));
+        return (new TripResource(Trip::with(['hotel', 'discount', 'tagsAssigns'])->find($id)))->oneTrip();
     }
 
     /**

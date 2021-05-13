@@ -4,8 +4,8 @@ namespace Database\Factories;
 
 use App\Models\Trip;
 use DateInterval;
+use DateTime;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Symfony\Component\Console\Output\ConsoleOutput;
 
 class TripFactory extends Factory
 {
@@ -25,7 +25,7 @@ class TripFactory extends Factory
     {
         $dateIn     = $this->faker->dateTimeBetween('-1 year', '+1 year');
         $duration   = $this->faker->numberBetween(7,20);
-        $dateOut    = new \DateTime( $dateIn->format('Y-m-d H:i:sP'));
+        $dateOut    = new DateTime( $dateIn->format('Y-m-d H:i:sP'));
 
         $dateOut->add(new DateInterval("P{$duration}D"));
 
@@ -38,7 +38,7 @@ class TripFactory extends Factory
             'meal_option'          => $this->faker->randomElement(['OB', 'HB', 'FB', 'BB', 'AI']),
             'hotel_id'             => $this->faker->numberBetween(1, 20),
             'reservation'          => false,
-            'discount_id'          => $this->faker->numberBetween(1,5),
+            'discount_id'          => $this->faker->randomElement([null, $this->faker->numberBetween(1,5)]),
             'image'                => $this->faker->image(storage_path('app/public/tripsWallpapers'), 300, 300, 'travel')
         ];
     }
