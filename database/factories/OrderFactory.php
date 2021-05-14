@@ -24,12 +24,13 @@ class OrderFactory extends Factory
     public function definition()
     {
         $tripId = $this->faker->numberBetween(1,25);
-        while (1) {
-            $userId = $this->faker->numberBetween(1,50);
-            if (User::all()->find($userId)->role == 'user') {
-                break;
-            }
-        }
+        $userId = User::where('role', '=', 'client')->inRandomOrder()->first()->id;
+//        while (1) {
+//            $userId = $this->faker->numberBetween(1,50);
+//            if (User::all()->find($userId)->role == 'client') {
+//                break;
+//            }
+//        }
         $paid = $this->faker->boolean();
 
         //calculate price

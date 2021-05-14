@@ -21,12 +21,11 @@ class MessageFactory extends Factory
      */
     public function definition()
     {
-        while (1) {
+        $from = 1;
+        $to = 1;
+        while ($from == $to) {
             $from = $this->faker->numberBetween(1,50);
             $to = $this->faker->numberBetween(1,50);
-            if ($from != $to) {
-                break;
-            }
         }
 
         return [
