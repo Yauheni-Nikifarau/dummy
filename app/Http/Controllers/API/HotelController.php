@@ -16,7 +16,7 @@ class HotelController extends Controller
      */
     public function index()
     {
-        return HotelResource::collection(Hotel::with('trips')->get());
+        return HotelResource::collection(Hotel::with('trips', 'orders')->get());
     }
 
     /**

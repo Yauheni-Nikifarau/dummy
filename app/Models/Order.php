@@ -11,16 +11,11 @@ class Order extends Model
 
     public function trip()
     {
-        return $this->belongsTo(Trip::class);
+        return $this->belongsTo(Trip::class)->with('hotel');
     }
 
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function hotel()
-    {
-        return $this->hasOneThrough(Hotel::class, Trip::class);
     }
 }
