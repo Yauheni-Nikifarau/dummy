@@ -12,7 +12,7 @@ class TagsAssignResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function tags()
+    public function toArray($request)
     {
         $res =[];
 

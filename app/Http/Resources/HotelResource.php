@@ -13,7 +13,7 @@ class HotelResource extends JsonResource
      *
      * @return array
      */
-    public function forOneHotel()
+    public function toArray($request)
     {
         return [
             'id'                => $this->id,
@@ -22,33 +22,8 @@ class HotelResource extends JsonResource
             'stars'             => $this->stars,
             'country'           => $this->country,
             'city'              => $this->city,
-            'trips'             => (new TripResource($this->trips))->tripsOfHotel()
+            'trips'             => TripResource::collection($this->trips),
+            'orders'            => OrderResource::collection($this->orders)
         ];
-    }
-
-    /**
-     * Transform the resource with information
-     * about all hotels and with information
-     * about amount of trips of every hotel into an array.
-     *
-     * @return array
-     */
-    public function forManyHotels()
-    {
-        $res =[];
-
-        foreach ($this->resource as $hotel) {
-            $res[] = [
-                'id'                => $hotel->id,
-                'name'              => $hotel->name,
-                'description'       => $hotel->description,
-                'stars'             => $hotel->stars,
-                'country'           => $hotel->country,
-                'city'              => $hotel->city,
-                'number_of_trips'   => $hotel->trips->count()
-            ];
-        }
-
-        return $res;
     }
 }

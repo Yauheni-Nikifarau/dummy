@@ -27,8 +27,7 @@ class Trip extends Model
         return $this->belongsTo(Hotel::class);
     }
 
-    public function tagsAssigns()
-    {
-        return $this->hasMany(TagsAssign::class);
+    public function tags() {
+        return $this->belongsToMany(Tag::class, 'tags_assigns');
     }
 }

@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\MessageResource;
-use App\Models\Message;
+use App\Http\Resources\UserResource;
+use App\Models\User;
 use Illuminate\Http\Request;
 
-class MessageController extends Controller
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,7 +16,7 @@ class MessageController extends Controller
      */
     public function index()
     {
-        return MessageResource::collection(Message::with('from', 'to')->get());
+        return UserResource::collection(User::all());
     }
 
     /**
@@ -34,11 +34,11 @@ class MessageController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return MessageResource
+     * @return UserResource
      */
     public function show($id)
     {
-        return new MessageResource(Message::with('from', 'to')->find($id));
+        return new UserResource(User::find($id));
     }
 
     /**

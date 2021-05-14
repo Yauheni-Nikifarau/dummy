@@ -12,11 +12,11 @@ class HotelController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return array
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index()
     {
-        return (new HotelResource(Hotel::with('trips')->get()))->forManyHotels();
+        return HotelResource::collection(Hotel::with('trips')->get());
     }
 
     /**
@@ -34,11 +34,11 @@ class HotelController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return array
+     * @return HotelResource
      */
     public function show($id)
     {
-        return (new HotelResource(Hotel::with('trips')->find($id)))->forOneHotel();
+        return new HotelResource(Hotel::with('trips', 'orders')->find($id));
     }
 
     /**

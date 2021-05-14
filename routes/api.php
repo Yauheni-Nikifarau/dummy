@@ -4,6 +4,7 @@ use App\Http\Controllers\API\HotelController;
 use App\Http\Controllers\API\MessageController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\TripController;
+use App\Http\Controllers\API\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,12 +19,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/orders', [OrderController::class, 'index']);
-Route::get('/orders/{id}', [OrderController::class, 'show']);
-Route::get('/trips', [TripController::class, 'index']);
-Route::get('/trips/{id}', [TripController::class, 'show']);
-Route::get('/hotels', [HotelController::class, 'index']);
-Route::get('/hotels/{id}', [HotelController::class, 'show']);
-Route::get('/messages', [MessageController::class, 'index']);
-Route::get('/messages/{id}', [MessageController::class, 'show']);
+
+Route::resource('orders', OrderController::class);
+Route::resource('trips', TripController::class);
+Route::resource('hotels', HotelController::class);
+Route::resource('messages', MessageController::class);
+Route::resource('users', UserController::class);
+
 

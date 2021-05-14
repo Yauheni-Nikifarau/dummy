@@ -6,32 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    public function manyOrders()
-    {
-        $res =[];
-
-        foreach ($this->resource as $order) {
-            $res[] = [
-                'id' => $order->id,
-                'trip' => $order->trip->name,
-                'user' => $order->user->name . ' ' . $order->user->surname,
-                'hotel' =>$order->trip->hotel->name,
-                'paid' => $order->paid,
-                'reservation_expires' => $order->reservation_expires,
-                'price' => $order->price
-            ];
-        }
-
-        return $res;
-    }
-
-    public function oneOrder()
+    public function toArray ($request)
     {
         return [
             'id' => $this->id,

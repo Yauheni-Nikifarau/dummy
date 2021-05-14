@@ -14,11 +14,11 @@ class OrderController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return array
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index()
     {
-        return (new OrderResource(Order::with('trip', 'user')->get()))->manyOrders();
+        return OrderResource::collection(Order::with('trip', 'user')->get());
     }
 
     /**
@@ -36,11 +36,11 @@ class OrderController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return array
+     * @return OrderResource
      */
     public function show($id)
     {
-        return (new OrderResource(Order::with('trip', 'user')->find($id)))->oneOrder();
+        return new OrderResource(Order::with('trip', 'user')->find($id));
     }
 
     /**
