@@ -18,7 +18,6 @@ class Hotels extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->integer('stars');
-            $table->boolean('children');
             $table->string('country');
             $table->string('city');
             $table->timestamps();

@@ -14,6 +14,14 @@ class TagsTableSeeder extends Seeder
      */
     public function run()
     {
-        Tag::factory()->count(10)->create();
+        Tag::create(['tag_name' => 'children']);
+        Tag::create(['tag_name' => 'beach']);
+        Tag::create(['tag_name' => 'rent auto']);
+        Tag::create(['tag_name' => 'spa']);
+        Tag::create(['tag_name' => 'diving']);
+        Tag::create(['tag_name' => 'surfing']);
+        Tag::create(['tag_name' => 'bbq']);
+        Tag::create(['tag_name' => '24 hours bar']);
+        Tag::create(['tag_name' => 'self-service buffet']);
     }
 }

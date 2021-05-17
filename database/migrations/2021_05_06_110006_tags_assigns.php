@@ -13,7 +13,7 @@ class TagsAssigns extends Migration
      */
     public function up()
     {
-        Schema::create('tags_assign', function (Blueprint $table) {
+        Schema::create('tags_assigns', function (Blueprint $table) {
             $table->id();
             $table->foreignId('trip_id');
             $table->foreignId('tag_id');

@@ -2,18 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\Tag;
+use App\Models\TagsAssign;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
-class TagFactory extends Factory
+class TagsAssignFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Tag::class;
+    protected $model = TagsAssign::class;
 
     /**
      * Define the model's default state.
@@ -23,7 +22,8 @@ class TagFactory extends Factory
     public function definition()
     {
         return [
-            'tag_name' => Str::random(10)
+            'trip_id' => $this->faker->numberBetween(1,25),
+            'tag_id' => $this->faker->numberBetween(1,9)
         ];
     }
 }
