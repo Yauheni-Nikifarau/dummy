@@ -9,8 +9,8 @@ class Tag extends Model
 {
     use HasFactory;
 
-    public  function trips()
+    public function trips()
     {
-        return $this->belongsToMany(Trip::class, 'tag_assigns', 'trip_id', 'tag_id');
+        return $this->belongsToMany(Trip::class, 'tags_assigns');
     }
 }

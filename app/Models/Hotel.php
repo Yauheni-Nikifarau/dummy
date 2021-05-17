@@ -13,4 +13,9 @@ class Hotel extends Model
     {
         return $this->hasMany(Trip::class);
     }
+
+    public function orders()
+    {
+        return $this->hasManyThrough(Order::class, Trip::class);
+    }
 }
