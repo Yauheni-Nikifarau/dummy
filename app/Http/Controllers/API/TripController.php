@@ -8,7 +8,7 @@ use App\Models\Trip;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 
-class TripController extends Controller
+class TripController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -17,20 +17,11 @@ class TripController extends Controller
      */
     public function index()
     {
-        $trips = Trip::with([
-
-                'hotel',
-                'discount' => function (BelongsTo $query) {
-                    $query->withDefault([
-                        'value' => 0,
-                        'name' => null]);
-                    },
-                'tags'])
-
+        $trips = Trip::with(['hotel', 'discount', 'tags'])
                 ->where('reservation', '=', 0)
                 ->get();
 
-        return TripResource::collection($trips);
+        return $this->responseSuccess(TripResource::collection($trips));
     }
 
     /**
@@ -52,17 +43,15 @@ class TripController extends Controller
      */
     public function show($id)
     {
-        $trip = Trip::with([
+        $trip = Trip::with(['hotel', 'discount', 'tags'])
+                ->find($id);
 
-            'hotel',
-            'discount' => function (BelongsTo $query) {
-                $query->withDefault([
-                    'value' => 0,
-                    'name' => null]);
-            },
-            'tags'])
-            ->find($id);
-        return new TripResource($trip);
+        if ($trip) {
+            return $this->responseSuccess(new TripResource($trip));
+        } else {
+            return $this->responseError('There is no trip with such id', 404);
+        }
+
     }
 
     /**

@@ -9,15 +9,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Http\Request;
 
-class HotelController extends Controller
+class HotelController extends ApiController
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\Response
      */
     public function index()
     {
+
         $resource = Hotel::with([
             'trips' => function (HasMany $query) {
                 $query->with(['tags', 'discount']);
@@ -26,7 +27,7 @@ class HotelController extends Controller
                 $query->with(['user', 'trip']);
             }
         ])->get();
-        return HotelResource::collection($resource);
+        return $this->responseSuccess(HotelResource::collection($resource));
     }
 
     /**
@@ -44,7 +45,7 @@ class HotelController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return HotelResource
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function show($id)
     {
@@ -56,7 +57,12 @@ class HotelController extends Controller
                 $query->with(['user', 'trip']);
             }
         ])->find($id);
-        return new HotelResource($resource);
+        if ($resource) {
+            return $this->responseSuccess(new HotelResource($resource));
+        } else {
+            return $this->responseError('There is no hotel with such id', 404);
+        }
+
     }
 
     /**

@@ -22,8 +22,7 @@ class TripResource extends JsonResource
             'date_out'       => $this->date_out,
             'hotel'          => new HotelResource($this->whenLoaded('hotel')),
             'meal_option'    => $this->meal_option,
-            'discount_value' => $this->discount->value,
-            'discount_name'  => $this->discount->name,
+            'discount'       => $this->discount ?? null,
             'image'          => $this->image,
             'tags'           => TagResource::collection($this->tags)
         ];

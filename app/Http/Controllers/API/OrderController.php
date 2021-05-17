@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 
 
-class OrderController extends Controller
+class OrderController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -24,7 +24,7 @@ class OrderController extends Controller
                 $query->with(['hotel']);
             },
             'user'])->get();
-        return OrderResource::collection($resource);
+        return $this->responseSuccess(OrderResource::collection($resource));
     }
 
     /**
@@ -51,7 +51,12 @@ class OrderController extends Controller
                 $query->with(['hotel']);
             },
             'user'])->find($id);
-        return new OrderResource($resource);
+        if ($resource) {
+            return $this->responseSuccess(new OrderResource($resource));
+        } else {
+            return $this->responseError('There is no order with such id', 404);
+        }
+
     }
 
     /**

@@ -7,16 +7,16 @@ use App\Http\Resources\MessageResource;
 use App\Models\Message;
 use Illuminate\Http\Request;
 
-class MessageController extends Controller
+class MessageController extends ApiController
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\Response
      */
     public function index()
     {
-        return MessageResource::collection(Message::with('from', 'to')->get());
+        return $this->responseSuccess(MessageResource::collection(Message::with('from', 'to')->get()));
     }
 
     /**
@@ -38,7 +38,12 @@ class MessageController extends Controller
      */
     public function show($id)
     {
-        return new MessageResource(Message::with('from', 'to')->find($id));
+        $res = Message::with('from', 'to')->find($id);
+        if ($res) {
+            return $this->responseSuccess(new MessageResource($res));
+        } else {
+            return $this->responseError('There is no message with such id', 404);
+        }
     }
 
     /**

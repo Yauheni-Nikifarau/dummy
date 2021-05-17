@@ -7,7 +7,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class UserController extends Controller
+class UserController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -16,7 +16,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return UserResource::collection(User::all());
+        return $this->responseSuccess(UserResource::collection(User::all()));
     }
 
     /**
@@ -36,9 +36,15 @@ class UserController extends Controller
      * @param  int  $id
      * @return UserResource
      */
-    public function show($id)
+    public function show ($id)
     {
-        return new UserResource(User::find($id));
+        $res = User::find($id);
+        if ($res) {
+            return $this->responseSuccess(new UserResource($res));
+        } else {
+            return $this->responseError('There is no user with such id', 404);
+        }
+
     }
 
     /**
