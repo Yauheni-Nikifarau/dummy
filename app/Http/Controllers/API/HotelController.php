@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\HotelResource;
 use App\Models\Hotel;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Http\Request;
 
 class HotelController extends Controller
@@ -16,7 +18,15 @@ class HotelController extends Controller
      */
     public function index()
     {
-        return HotelResource::collection(Hotel::with('trips', 'orders')->get());
+        $resource = Hotel::with([
+            'trips' => function (HasMany $query) {
+                $query->with(['tags', 'discount']);
+            },
+            'orders' => function (HasManyThrough $query) {
+                $query->with(['user', 'trip']);
+            }
+        ])->get();
+        return HotelResource::collection($resource);
     }
 
     /**
@@ -38,7 +48,15 @@ class HotelController extends Controller
      */
     public function show($id)
     {
-        return new HotelResource(Hotel::with('trips', 'orders')->find($id));
+        $resource = Hotel::with([
+            'trips' => function (HasMany $query) {
+                $query->with(['tags', 'discount']);
+            },
+            'orders' => function (HasManyThrough $query) {
+                $query->with(['user', 'trip']);
+            }
+        ])->find($id);
+        return new HotelResource($resource);
     }
 
     /**

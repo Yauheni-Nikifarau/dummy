@@ -20,7 +20,7 @@ class TripResource extends JsonResource
             'price'          => $this->price,
             'date_in'        => $this->date_in,
             'date_out'       => $this->date_out,
-            'hotel_name'     => $this->hotel->name,
+            'hotel'          => new HotelResource($this->whenLoaded('hotel')),
             'meal_option'    => $this->meal_option,
             'discount_value' => $this->discount->value,
             'discount_name'  => $this->discount->name,

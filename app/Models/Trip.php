@@ -16,10 +16,7 @@ class Trip extends Model
 
     public function discount()
     {
-        return $this->belongsTo(Discount::class)->withDefault([
-            'value' => 0,
-            'name' => null
-        ]);
+        return $this->belongsTo(Discount::class);
     }
 
     public function hotel()

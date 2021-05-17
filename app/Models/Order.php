@@ -11,7 +11,7 @@ class Order extends Model
 
     public function trip()
     {
-        return $this->belongsTo(Trip::class)->with('hotel');
+        return $this->belongsTo(Trip::class);
     }
 
     public function user()

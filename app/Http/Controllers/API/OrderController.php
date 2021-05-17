@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 
 
@@ -18,7 +19,12 @@ class OrderController extends Controller
      */
     public function index()
     {
-        return OrderResource::collection(Order::with('trip', 'user')->get());
+        $resource = Order::with([
+            'trip' => function (BelongsTo $query) {
+                $query->with(['hotel']);
+            },
+            'user'])->get();
+        return OrderResource::collection($resource);
     }
 
     /**
@@ -40,7 +46,12 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        return new OrderResource(Order::with('trip', 'user')->find($id));
+        $resource = Order::with([
+            'trip' => function (BelongsTo $query) {
+                $query->with(['hotel']);
+            },
+            'user'])->find($id);
+        return new OrderResource($resource);
     }
 
     /**

@@ -11,11 +11,11 @@ class Hotel extends Model
 
     public function trips()
     {
-        return $this->hasMany(Trip::class)->with(['hotel', 'tags', 'discount']);
+        return $this->hasMany(Trip::class);
     }
 
     public function orders()
     {
-        return $this->hasManyThrough(Order::class, Trip::class)->with(['user', 'trip']);
+        return $this->hasManyThrough(Order::class, Trip::class);
     }
 }

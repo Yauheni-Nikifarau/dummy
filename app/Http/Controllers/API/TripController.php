@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TripResource;
 use App\Models\Trip;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 
 class TripController extends Controller
@@ -16,7 +17,16 @@ class TripController extends Controller
      */
     public function index()
     {
-        $trips = Trip::with(['hotel', 'discount', 'tags'])
+        $trips = Trip::with([
+
+                'hotel',
+                'discount' => function (BelongsTo $query) {
+                    $query->withDefault([
+                        'value' => 0,
+                        'name' => null]);
+                    },
+                'tags'])
+
                 ->where('reservation', '=', 0)
                 ->get();
 
@@ -42,7 +52,17 @@ class TripController extends Controller
      */
     public function show($id)
     {
-        return new TripResource(Trip::with(['hotel', 'discount', 'tags'])->find($id));
+        $trip = Trip::with([
+
+            'hotel',
+            'discount' => function (BelongsTo $query) {
+                $query->withDefault([
+                    'value' => 0,
+                    'name' => null]);
+            },
+            'tags'])
+            ->find($id);
+        return new TripResource($trip);
     }
 
     /**

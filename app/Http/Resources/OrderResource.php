@@ -12,7 +12,7 @@ class OrderResource extends JsonResource
             'id' => $this->id,
             'trip' => $this->trip->name,
             'user' => $this->user->name . ' ' . $this->user->surname,
-            'hotel' =>$this->trip->hotel->name,
+            'hotel_name' =>$this->trip->hotel->name,
             'paid' => $this->paid,
             'reservation_expires' => $this->reservation_expires,
             'price' => $this->price
