@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
 Route::view('/', 'welcome');
 
 
@@ -21,3 +20,10 @@ Route::get('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 require __DIR__.'/auth.php';
+
+Route::get('reset-throttle', function (Request $request) {
+    app(\Illuminate\Cache\RateLimiter::class)->clear('127.0.0.1');
+    app(\Illuminate\Cache\RateLimiter::class)->clear('localhost');
+});
+
+
