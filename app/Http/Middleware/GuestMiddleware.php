@@ -16,11 +16,10 @@ class GuestMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if (auth()->user() !== null) {
+        if (auth()->check()) {
             return response([
                 'success' => false,
-                'message' => 'Only non-authenticated user access this possibility',
-                'data'    => []
+                'message' => 'Only non-authenticated user can access this possibility'
             ], 403);
         }
 

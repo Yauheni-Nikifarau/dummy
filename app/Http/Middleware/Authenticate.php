@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Http\Request;
+use Closure;
 
 class Authenticate extends Middleware
 {
@@ -19,4 +20,27 @@ class Authenticate extends Middleware
             return route('login');
         }
     }
+
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  string[]  ...$guards
+     * @return mixed
+     *
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
+    public function handle($request, Closure $next, ...$guards)
+    {
+        if ( ! auth()->check()) {
+            return response([
+                'success' => false,
+                'message' => 'Only authenticated user can access this possibility',
+            ], 403);
+        };
+
+        return $next($request);
+    }
+
 }
