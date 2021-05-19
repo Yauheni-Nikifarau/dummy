@@ -15,15 +15,20 @@ class OrderController extends ApiController
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\Response
      */
     public function index()
     {
         $resource = Order::with([
+
             'trip' => function (BelongsTo $query) {
                 $query->with(['hotel']);
-            },
-            'user'])->get();
+                },
+
+            'user'
+
+            ])->get();
+
         return $this->responseSuccess(OrderResource::collection($resource));
     }
 
@@ -42,21 +47,25 @@ class OrderController extends ApiController
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return OrderResource
+     * @return OrderResource|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function show($id)
     {
         $resource = Order::with([
+
             'trip' => function (BelongsTo $query) {
                 $query->with(['hotel']);
-            },
-            'user'])->find($id);
+                },
+
+            'user'
+
+            ])->find($id);
+
         if ($resource) {
             return $this->responseSuccess(new OrderResource($resource));
         } else {
             return $this->responseError('There is no order with such id', 404);
         }
-
     }
 
     /**

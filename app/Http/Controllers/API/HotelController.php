@@ -20,13 +20,17 @@ class HotelController extends ApiController
     {
 
         $resource = Hotel::with([
-            'trips' => function (HasMany $query) {
+
+            'trips'     => function (HasMany $query) {
                 $query->with(['tags', 'discount']);
-            },
-            'orders' => function (HasManyThrough $query) {
+                },
+
+            'orders'    => function (HasManyThrough $query) {
                 $query->with(['user', 'trip']);
-            }
-        ])->get();
+                }
+
+            ])->get();
+
         return $this->responseSuccess(HotelResource::collection($resource));
     }
 
@@ -50,19 +54,22 @@ class HotelController extends ApiController
     public function show($id)
     {
         $resource = Hotel::with([
+
             'trips' => function (HasMany $query) {
                 $query->with(['tags', 'discount']);
-            },
+                },
+
             'orders' => function (HasManyThrough $query) {
                 $query->with(['user', 'trip']);
-            }
-        ])->find($id);
+                }
+
+            ])->find($id);
+
         if ($resource) {
             return $this->responseSuccess(new HotelResource($resource));
         } else {
             return $this->responseError('There is no hotel with such id', 404);
         }
-
     }
 
     /**

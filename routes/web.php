@@ -21,9 +21,5 @@ Route::get('/dashboard', function () {
 
 require __DIR__.'/auth.php';
 
-Route::get('reset-throttle', function (Request $request) {
-    app(\Illuminate\Cache\RateLimiter::class)->clear('127.0.0.1');
-    app(\Illuminate\Cache\RateLimiter::class)->clear('localhost');
-});
 
 
