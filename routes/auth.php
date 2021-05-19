@@ -7,25 +7,31 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+    ->middleware('auth')
     ->name('logout');
 
 Route::post('/register', [RegisteredUserController::class, 'store'])
-    ->name(('register'));
+    ->middleware('guest')
+    ->name('register');
 
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])
+    ->middleware('guest')
     ->name('login');
 
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
-                ->name('password.email');
+    ->middleware('guest')
+    ->name('password.email');
 
 Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])
-                ->middleware('guest')
-                ->name('password.reset');
+    ->middleware('guest')
+    ->name('password.reset');
 
 Route::post('/reset-password', [NewPasswordController::class, 'store'])
-                ->name('password.update');
+    ->middleware('guest')
+    ->name('password.update');
 
+//Route::post('/login/me', [AuthenticatedSessionController::class, 'me']);
 
 
 
@@ -60,8 +66,7 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
 //
 
 //
-//Route::post('/login/me', [AuthenticatedSessionController::class, 'me'])
-//    ->middleware('guest');
+
 //
 //Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
 //                ->middleware('guest')

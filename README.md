@@ -61,9 +61,3 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
-
-
-мидлвары - перед контроллером
-и через кернел файл добавить
-в конструкторе контроллера тоже можно написать мидлвары, но применить к отдельным роутам
-создать две одна -авторизированные, другая - неавторизированные
