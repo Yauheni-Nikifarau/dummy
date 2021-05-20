@@ -9,6 +9,8 @@ class Trip extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['reservation'];
+
     public function orders()
     {
         return $this->hasMany(Order::class);

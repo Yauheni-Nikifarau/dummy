@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\Trip;
+use Carbon\Carbon;
 use DateInterval;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
@@ -51,10 +52,6 @@ class OrderController extends ApiController
 
         $trip = Trip::find($trip_id);
 
-        if ( ! $user_id) {
-            return $this->responseError('Who are you?', 400);
-        }
-
         if ( ! $trip) {
             return $this->responseError('There is no trip with such id', 400);
         }
@@ -63,8 +60,7 @@ class OrderController extends ApiController
             return $this->responseError('This trip has been booked', 400);
         }
 
-        $reservation_expires = new \DateTime();
-        $reservation_expires->add(new DateInterval("P3D"));
+        $reservation_expires = (new \Carbon\Carbon)->addDays(3);
 
         try {
 
@@ -78,24 +74,21 @@ class OrderController extends ApiController
             $order->reservation_expires = $reservation_expires;
             $order->price               = $trip->price * (100 - ($trip->discount->value ?? 0)) / 100;
 
-            $trip->reservation          = true;
-
-            $trip->save();
+            $trip->update(['reservation' => true]);
             $order->save();
+
+            DB::commit();
 
             return response([
                 'success' => true,
                 'message' => 'Your order confirmed',
             ], 201);
 
-            DB::commit();
-
         } catch (\Exception $e) {
 
             DB::rollBack();
 
             return $this->responseError('Sorry, but something were wrong. Try again.', 500);
-
         }
 
     }
