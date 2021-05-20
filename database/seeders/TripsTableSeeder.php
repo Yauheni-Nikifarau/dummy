@@ -16,6 +16,6 @@ class TripsTableSeeder extends Seeder
     {
         \Storage::deleteDirectory('public/tripsWallpapers');
         \Storage::makeDirectory('public/tripsWallpapers');
-        Trip::factory()->count(25)->create();
+        Trip::factory()->count(50)->create();
     }
 }

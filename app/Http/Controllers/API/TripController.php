@@ -17,9 +17,6 @@ class TripController extends ApiController
      */
     public function index(Request $request)
     {
-
-
-
         $trips = Trip::getTripsWithfilter($request);
 
         return $this->responseSuccess(TripResource::collection($trips));
