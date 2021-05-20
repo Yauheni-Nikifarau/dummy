@@ -12,7 +12,7 @@ class UserController extends ApiController
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\Response
      */
     public function index()
     {
@@ -34,7 +34,7 @@ class UserController extends ApiController
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return UserResource
+     * @return UserResource|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function show ($id)
     {

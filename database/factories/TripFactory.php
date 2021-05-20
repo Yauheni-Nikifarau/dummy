@@ -29,6 +29,8 @@ class TripFactory extends Factory
 
         $dateOut->add(new DateInterval("P{$duration}D"));
 
+        $imagePath = $this->faker->image(storage_path('app/public/tripsWallpapers'), 300, 300, 'travel');
+
         return [
             'name'                 => $this->faker->words($this->faker->numberBetween(1,5), true),
             'price'                => $this->faker->numberBetween(100, 5000),
@@ -39,7 +41,7 @@ class TripFactory extends Factory
             'hotel_id'             => $this->faker->numberBetween(1, 20),
             'reservation'          => false,
             'discount_id'          => $this->faker->randomElement([null, $this->faker->numberBetween(1,5)]),
-            'image'                => $this->faker->image(storage_path('app/public/tripsWallpapers'), 300, 300, 'travel')
+            'image'                => 'storage/' . str_replace(storage_path('app/public'), '', $imagePath)
         ];
     }
 }

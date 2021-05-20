@@ -13,10 +13,12 @@ class TripController extends ApiController
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        //$hotel = $request->input('hotel');
+
         $trips = Trip::with(['hotel', 'discount', 'tags'])
                 ->where('reservation', '=', 0)
                 ->get();
@@ -39,7 +41,7 @@ class TripController extends ApiController
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return TripResource|array
+     * @return TripResource|array|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function show($id)
     {
