@@ -17,11 +17,10 @@ class TripController extends ApiController
      */
     public function index(Request $request)
     {
-        //$hotel = $request->input('hotel');
 
-        $trips = Trip::with(['hotel', 'discount', 'tags'])
-                ->where('reservation', '=', 0)
-                ->get();
+
+
+        $trips = Trip::getTripsWithfilter($request);
 
         return $this->responseSuccess(TripResource::collection($trips));
     }
