@@ -8,7 +8,7 @@ use App\Models\Trip;
 use DateInterval;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 
 
 class OrderController extends ApiController
@@ -36,16 +36,15 @@ class OrderController extends ApiController
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
+     * @throws \Throwable
      */
     public function store(Request $request)
     {
         $request->validate([
             'trip_id' => 'required|int',
         ]);
-
-        $order = new Order();
 
         $trip_id = $request->input('trip_id');
         $user_id = auth()->user()->id ?? null;
@@ -61,35 +60,44 @@ class OrderController extends ApiController
         }
 
         if ($trip->reservation) {
-            return $this->responseError('This trip has been reservated', 400);
+            return $this->responseError('This trip has been booked', 400);
         }
 
         $reservation_expires = new \DateTime();
         $reservation_expires->add(new DateInterval("P3D"));
 
-        $order->trip_id = $trip_id;
-        $order->user_id = $user_id;
-        $order->paid = false;
-        $order->reservation_expires = $reservation_expires;
-        $order->price = $trip->price * (100 - ($trip->discount->value ?? 0)) / 100;
+        try {
 
-        $trip->reservation = true;
+            DB::beginTransaction();
 
-        $tripResult = $trip->save();
+            $order = new Order();
 
-        if ($tripResult) {
-            $orderResult = $order->save();
+            $order->trip_id             = $trip_id;
+            $order->user_id             = $user_id;
+            $order->paid                = false;
+            $order->reservation_expires = $reservation_expires;
+            $order->price               = $trip->price * (100 - ($trip->discount->value ?? 0)) / 100;
 
-            if ($orderResult) {
-                return response([
-                    'success' => true,
-                    'message' => 'Your order confirmed',
-                ], 201);
-            } else {
-                $trip->rollback();
-            }
+            $trip->reservation          = true;
+
+            $trip->save();
+            $order->save();
+
+            return response([
+                'success' => true,
+                'message' => 'Your order confirmed',
+            ], 201);
+
+            DB::commit();
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return $this->responseError('Sorry, but something were wrong. Try again.', 500);
+
         }
-        return $this->responseError('Sorry, but something were wrong. Try again.', 500);
+
     }
 
     /**
