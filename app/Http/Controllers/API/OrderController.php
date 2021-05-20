@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Models\Trip;
+use DateInterval;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 
@@ -35,14 +36,62 @@ class OrderController extends ApiController
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'trip_id' => 'required|int',
+        ]);
+
+        $order = new Order();
+
+        $trip_id = $request->input('trip_id');
+        $user_id = auth()->user()->id ?? null;
+
+        $trip = Trip::find($trip_id);
+
+        if ( ! $user_id) {
+            return $this->responseError('Who are you?', 400);
+        }
+
+        if ( ! $trip) {
+            return $this->responseError('There is no trip with such id', 400);
+        }
+
+        if ($trip->reservation) {
+            return $this->responseError('This trip has been reservated', 400);
+        }
+
+        $reservation_expires = new \DateTime();
+        $reservation_expires->add(new DateInterval("P3D"));
+
+        $order->trip_id = $trip_id;
+        $order->user_id = $user_id;
+        $order->paid = false;
+        $order->reservation_expires = $reservation_expires;
+        $order->price = $trip->price * (100 - ($trip->discount->value ?? 0)) / 100;
+
+        $trip->reservation = true;
+
+        $tripResult = $trip->save();
+
+        if ($tripResult) {
+            $orderResult = $order->save();
+
+            if ($orderResult) {
+                return response([
+                    'success' => true,
+                    'message' => 'Your order confirmed',
+                ], 201);
+            } else {
+                $trip->rollback();
+            }
+        }
+        return $this->responseError('Sorry, but something were wrong. Try again.', 500);
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return OrderResource
+     * @return OrderResource|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function show($id)
     {
