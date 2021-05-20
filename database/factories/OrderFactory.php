@@ -36,7 +36,7 @@ class OrderFactory extends Factory
         //calculate price
         $trip = Trip::all()->find($tripId);
         $startPrice = $trip->price;
-        $discount = $trip->discount->value;
+        $discount = $trip->discount->value ?? 0;
         $price = $startPrice * (100 - $discount) / 100;
 
         $reservation = $this->faker->dateTimeBetween('-3 months', '+3 days');

@@ -34,11 +34,12 @@ class MessageController extends ApiController
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return MessageResource
+     * @return MessageResource|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function show($id)
     {
         $res = Message::with('from', 'to')->find($id);
+
         if ($res) {
             return $this->responseSuccess(new MessageResource($res));
         } else {
