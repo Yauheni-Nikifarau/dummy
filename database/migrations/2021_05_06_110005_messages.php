@@ -15,8 +15,8 @@ class Messages extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('from_id')->nullable();
-            $table->foreignId('to_id');
+            $table->foreignId('from_id')->unsigned()->nullable();
+            $table->foreignId('to_id')->unsigned();
             $table->string('subject')->nullable();
             $table->text('text')->nullable();
             $table->foreign('from_id')->references('id')->on('users');

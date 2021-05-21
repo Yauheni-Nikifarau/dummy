@@ -15,16 +15,17 @@ class TripResource extends JsonResource
     public function toArray ($request): array
     {
         return [
-            'id'             => $this->id,
-            'name'           => $this->name,
-            'price'          => $this->price,
-            'date_in'        => $this->date_in,
-            'date_out'       => $this->date_out,
-            'hotel'          => new HotelResource($this->whenLoaded('hotel')),
-            'meal_option'    => $this->meal_option,
-            'discount'       => $this->discount ?? null,
-            'image'          => $this->image,
-            'tags'           => TagResource::collection($this->tags)
+            'id'                    => $this->id,
+            'name'                  => $this->name,
+            'price'                 => $this->price,
+            'date_in'               => $this->date_in,
+            'date_out'              => $this->date_out,
+            'hotel'                 => new HotelResource($this->whenLoaded('hotel')),
+            'meal_option'           => $this->meal_option,
+            'discount'              => $this->discount ?? null,
+            'quantity_of_people'    => $this->quantity_of_people,
+            'image'                 => $this->image,
+            'tags'                  => TagResource::collection($this->tags)
         ];
     }
 }
