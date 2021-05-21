@@ -15,8 +15,8 @@ class Orders extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('trip_id')->nullable();
-            $table->foreignId('user_id');
+            $table->foreignId('trip_id')->unsigned()->nullable();
+            $table->foreignId('user_id')->unsigned();
             $table->boolean('paid')->default(false);
             $table->timestamp('reservation_expires');
             $table->decimal('price', 10, 2);

@@ -15,8 +15,8 @@ class TagsAssigns extends Migration
     {
         Schema::create('tags_assigns', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('trip_id');
-            $table->foreignId('tag_id');
+            $table->foreignId('trip_id')->unsigned();
+            $table->foreignId('tag_id')->unsigned();
             $table->foreign('trip_id')->references('id')->on('trips')->onDelete('cascade');
             $table->foreign('tag_id')->references('id')->on('tags')->onDelete('cascade');
             $table->timestamps();
