@@ -77,6 +77,13 @@ class TripController extends ApiController
         //
     }
 
+
+    /**
+     * Filter trips by different get parameters
+     *
+     * @param Request $request
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     */
     private function getTripsWithFilter(Request $request)
     {
         $trips = Trip::with(['hotel', 'discount', 'tags']);
