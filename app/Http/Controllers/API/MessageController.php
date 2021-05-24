@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Requests\IndexMessageRequest;
 use App\Http\Resources\MessageResource;
 use App\Models\Message;
 use App\Models\User;
@@ -16,20 +17,11 @@ class MessageController extends ApiController
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|AnonymousResourceCollection|\Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(IndexMessageRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'way' => 'string',
-            'to' => 'integer|exists:users,id',
-        ]);
-
-        if (!$validator->passes()) {
-            return $this->responseError('Wrong parameters', 400, $validator->errors());
-        }
-
         $userId = auth()->id();
 
-        $way = $request->input('way') ?? 'inbox';
+        $way = $request->input('way', 'inbox');
 
         switch ($way) {
             case 'inbox':
@@ -38,15 +30,9 @@ class MessageController extends ApiController
             case 'sent':
                 $messages = $this->getAllSentMessages($userId);
                 break;
-            case 'dialog':
-                if ($request->exists('to')) {
-                    $messages = $this->getDialogWith($userId, $request->input('to'));
-                } else {
-                    return $this->responseError('No opponent id', 400);
-                }
+            case 'dialogue':
+                $messages = $this->getDialogWith($userId, $request->input('to'));
                 break;
-            default:
-                return $this->responseError('Wrong messaging way', 400);
         }
 
         return $this->responseSuccess($messages);
