@@ -2,23 +2,31 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
 use App\Http\Resources\MessageResource;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 
 class MessageController extends ApiController
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|AnonymousResourceCollection|\Illuminate\Http\Response
      */
     public function index(Request $request)
     {
-        //TODO:make validation
-        //$messages = $this->responseSuccess(MessageResource::collection(Message::with('from', 'to')->get()));
+        $validator = \Validator::make($request->all(), [
+            'way' => 'string',
+            'to'  => 'integer',
+        ]);
+
+        if ( ! $validator->passes()) {
+            return $this->responseError('Wrong parameters', 400, $validator->errors());
+        }
+
         $user_id = auth()->user()->id;
 
         $way = $request->input('way') ?? 'inbox';
@@ -49,8 +57,6 @@ class MessageController extends ApiController
                 return $this->responseError('Wrong messaging way', 400);
         }
 
-        dd($messages);
-
         return $this->responseSuccess($messages);
     }
 
@@ -62,7 +68,53 @@ class MessageController extends ApiController
      */
     public function store(Request $request)
     {
-        //TODO: make messages storing
+        $validator = \Validator::make($request->all(), [
+            'to' => 'required|integer',
+            'subject' => 'string|max:255|nullable',
+            'text' => 'required|string|max:2000',
+        ]);
+
+        if ( ! $validator->passes()) {
+            return $this->responseError('Wrong parameters', 400, $validator->errors());
+        }
+
+        $user_id = auth()->user()->id;
+
+        $to_user = User::find($request->input('to'));
+
+        if ( ! $to_user) {
+            return $this->responseError('There is now user with such id', 400, ['to' => ['wrong user id']]);
+        }
+
+        try {
+
+            DB::beginTransaction();
+
+            $message = new Message();
+
+            $message->from_id = $user_id;
+            $message->to_id = $to_user->id;
+            $message->text = $request->input('text');
+
+            if ($request->exists('subject')) {
+                $message->subject = $request->input('subject');
+            }
+
+            $message->save();
+
+            DB::commit();
+
+            return response([
+                'success' => true,
+                'message' => "Your message to {$to_user->name} {$to_user->surname} has been sent",
+            ], 201);
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return $this->responseError('Sorry, but something were wrong. Try again.', 500);
+        }
     }
 
     /**
@@ -91,9 +143,36 @@ class MessageController extends ApiController
      */
     public function destroy($id)
     {
-        //TODO: make messages deleting
+        $message = Message::find($id);
+
+        if ( ! $message) {
+            return $this->responseError('There is no message with such id', 400);
+        }
+
+        $user_id = auth()->user()->id;
+
+        if ($message->from_id != $user_id && $message->to_id != $user_id) {
+            return $this->responseError('You don\'t have message with such id', 400);
+        }
+
+        $res = Message::destroy($id);
+
+        if ($res !== 0) {
+            return response([
+                'success' => true,
+                'message' => 'Deleted successfully',
+            ], 202);
+        } else {
+            return $this->responseError('Sorry, but something were wrong. Try again.', 500);
+        }
     }
 
+    /**
+     * Returns all inbox messages of concrete user
+     *
+     * @param $user_id
+     * @return AnonymousResourceCollection
+     */
     private function getAllInboxMessages($user_id)
     {
         $messages = Message::with('from', 'to')
@@ -105,6 +184,12 @@ class MessageController extends ApiController
         return $messages;
     }
 
+    /**
+     * Returns all sent messages of concrete user
+     *
+     * @param $user_id
+     * @return AnonymousResourceCollection
+     */
     private function getAllSentMessages($user_id)
     {
         $messages = Message::with('from', 'to')
@@ -116,6 +201,13 @@ class MessageController extends ApiController
         return $messages;
     }
 
+    /**
+     * Returns dialog between two users
+     *
+     * @param $user_id
+     * @param $to_id
+     * @return AnonymousResourceCollection
+     */
     private function getDialogWith($user_id, $to_id)
     {
         $messages = Message::with('from', 'to')
