@@ -7,7 +7,7 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class MessageController extends ApiController
 {
@@ -18,37 +18,29 @@ class MessageController extends ApiController
      */
     public function index(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'way' => 'string',
-            'to'  => 'integer',
+            'to'  => 'integer|exists:users,id',
         ]);
 
         if ( ! $validator->passes()) {
             return $this->responseError('Wrong parameters', 400, $validator->errors());
         }
 
-        $user_id = auth()->user()->id;
+        $userId = auth()->id();
 
         $way = $request->input('way') ?? 'inbox';
 
         switch ($way) {
             case 'inbox':
-                $messages = $this->getAllInboxMessages($user_id);
+                $messages = $this->getAllInboxMessages($userId);
                 break;
             case 'sent':
-                $messages = $this->getAllSentMessages($user_id);
+                $messages = $this->getAllSentMessages($userId);
                 break;
             case 'dialog':
                 if ($request->exists('to')) {
-
-                    $to_id = User::find($request->input('to'))->id;
-
-                    if ($to_id) {
-                        $messages = $this->getDialogWith($user_id, $to_id);
-                    } else {
-                        return $this->responseError('No user with such id', 400);
-                    }
-
+                    $messages = $this->getDialogWith($userId, $request->input('to'));
                 } else {
                     return $this->responseError('No opponent id', 400);
                 }
@@ -68,51 +60,34 @@ class MessageController extends ApiController
      */
     public function store(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'to' => 'required|integer',
-            'subject' => 'string|max:255|nullable',
-            'text' => 'required|string|max:2000',
+        $validator = Validator::make($request->all(), [
+            'to'        => 'required|integer|exists:user,id',
+            'subject'   => 'string|max:255|nullable',
+            'text'      => 'required|string|max:2000',
         ]);
 
         if ( ! $validator->passes()) {
             return $this->responseError('Wrong parameters', 400, $validator->errors());
         }
 
-        $user_id = auth()->user()->id;
+        $userId = auth()->id();
 
-        $to_user = User::find($request->input('to'));
+        $toUser = User::find($request->input('to'));
 
-        if ( ! $to_user) {
-            return $this->responseError('There is now user with such id', 400, ['to' => ['wrong user id']]);
-        }
+        $message = new Message();
 
-        try {
+        $message->from_id   = $userId;
+        $message->to_id     = $toUser->id;
+        $message->text      = $request->input('text');
+        $message->subject   = $request->input('subject');
 
-            DB::beginTransaction();
 
-            $message = new Message();
-
-            $message->from_id = $user_id;
-            $message->to_id = $to_user->id;
-            $message->text = $request->input('text');
-
-            if ($request->exists('subject')) {
-                $message->subject = $request->input('subject');
-            }
-
-            $message->save();
-
-            DB::commit();
-
+        if ($message->save()) {
             return response([
                 'success' => true,
-                'message' => "Your message to {$to_user->name} {$to_user->surname} has been sent",
+                'message' => "Your message to {$toUser->name} {$toUser->surname} has been sent",
             ], 201);
-
-        } catch (\Exception $e) {
-
-            DB::rollBack();
-
+        } else {
             return $this->responseError('Sorry, but something were wrong. Try again.', 500);
         }
     }
@@ -149,9 +124,9 @@ class MessageController extends ApiController
             return $this->responseError('There is no message with such id', 400);
         }
 
-        $user_id = auth()->user()->id;
+        $userId = auth()->id();
 
-        if ($message->from_id != $user_id && $message->to_id != $user_id) {
+        if ($message->from_id != $userId && $message->to_id != $userId) {
             return $this->responseError('You don\'t have message with such id', 400);
         }
 
@@ -170,13 +145,13 @@ class MessageController extends ApiController
     /**
      * Returns all inbox messages of concrete user
      *
-     * @param $user_id
+     * @param $userId
      * @return AnonymousResourceCollection
      */
-    private function getAllInboxMessages($user_id)
+    private function getAllInboxMessages($userId)
     {
         $messages = Message::with('from', 'to')
-                            ->where('to_id', $user_id)
+                            ->where('to_id', $userId)
                             ->get();
 
         $messages = MessageResource::collection($messages);
@@ -187,14 +162,14 @@ class MessageController extends ApiController
     /**
      * Returns all sent messages of concrete user
      *
-     * @param $user_id
+     * @param $userId
      * @return AnonymousResourceCollection
      */
-    private function getAllSentMessages($user_id)
+    private function getAllSentMessages($userId)
     {
         $messages = Message::with('from', 'to')
-            ->where('from_id', $user_id)
-            ->get();
+                            ->where('from_id', $userId)
+                            ->get();
 
         $messages = MessageResource::collection($messages);
 
@@ -204,22 +179,22 @@ class MessageController extends ApiController
     /**
      * Returns dialog between two users
      *
-     * @param $user_id
-     * @param $to_id
+     * @param $userId
+     * @param $toId
      * @return AnonymousResourceCollection
      */
-    private function getDialogWith($user_id, $to_id)
+    private function getDialogWith($userId, $toId)
     {
         $messages = Message::with('from', 'to')
-            ->where(function ($query) use ($user_id, $to_id) {
-                $query->where('from_id', $user_id)
-                        ->where('to_id', $to_id);
-            })
-            ->orWhere(function ($query) use ($user_id, $to_id) {
-                $query->where('from_id', $to_id)
-                    ->where('to_id', $user_id);
-            })
-            ->get();
+                            ->where(function ($query) use ($userId, $toId) {
+                                $query->where('from_id', $userId)
+                                        ->where('to_id', $toId);
+                            })
+                            ->orWhere(function ($query) use ($userId, $toId) {
+                                $query->where('from_id', $toId)
+                                    ->where('to_id', $userId);
+                            })
+                            ->get();
 
         $messages = MessageResource::collection($messages);
 
