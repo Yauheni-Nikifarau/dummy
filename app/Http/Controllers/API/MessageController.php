@@ -130,7 +130,7 @@ class MessageController extends ApiController
             return $this->responseError('You don\'t have message with such id', 400);
         }
 
-        $res = Message::destroy($id);
+        $res = $message->delete();
 
         if ($res !== 0) {
             return response([
