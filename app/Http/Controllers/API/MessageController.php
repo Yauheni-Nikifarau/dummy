@@ -20,10 +20,10 @@ class MessageController extends ApiController
     {
         $validator = Validator::make($request->all(), [
             'way' => 'string',
-            'to'  => 'integer|exists:users,id',
+            'to' => 'integer|exists:users,id',
         ]);
 
-        if ( ! $validator->passes()) {
+        if (!$validator->passes()) {
             return $this->responseError('Wrong parameters', 400, $validator->errors());
         }
 
@@ -55,18 +55,18 @@ class MessageController extends ApiController
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'to'        => 'required|integer|exists:user,id',
-            'subject'   => 'string|max:255|nullable',
-            'text'      => 'required|string|max:2000',
+            'to' => 'required|integer|exists:user,id',
+            'subject' => 'string|max:255|nullable',
+            'text' => 'required|string|max:2000',
         ]);
 
-        if ( ! $validator->passes()) {
+        if (!$validator->passes()) {
             return $this->responseError('Wrong parameters', 400, $validator->errors());
         }
 
@@ -76,10 +76,10 @@ class MessageController extends ApiController
 
         $message = new Message();
 
-        $message->from_id   = $userId;
-        $message->to_id     = $toUser->id;
-        $message->text      = $request->input('text');
-        $message->subject   = $request->input('subject');
+        $message->from_id = $userId;
+        $message->to_id = $toUser->id;
+        $message->text = $request->input('text');
+        $message->subject = $request->input('subject');
 
 
         if ($message->save()) {
@@ -95,12 +95,12 @@ class MessageController extends ApiController
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return MessageResource|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function show($id)
     {
-        $res = Message::with('from', 'to')->find($id);
+        $res = Message::with(['from', 'to'])->find($id);
 
         if ($res) {
             return $this->responseSuccess(new MessageResource($res));
@@ -113,14 +113,14 @@ class MessageController extends ApiController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
         $message = Message::find($id);
 
-        if ( ! $message) {
+        if (!$message) {
             return $this->responseError('There is no message with such id', 400);
         }
 
@@ -150,9 +150,9 @@ class MessageController extends ApiController
      */
     private function getAllInboxMessages($userId)
     {
-        $messages = Message::with('from', 'to')
-                            ->where('to_id', $userId)
-                            ->get();
+        $messages = Message::with(['from', 'to'])
+            ->where('to_id', $userId)
+            ->get();
 
         $messages = MessageResource::collection($messages);
 
@@ -167,9 +167,9 @@ class MessageController extends ApiController
      */
     private function getAllSentMessages($userId)
     {
-        $messages = Message::with('from', 'to')
-                            ->where('from_id', $userId)
-                            ->get();
+        $messages = Message::with(['from', 'to'])
+            ->where('from_id', $userId)
+            ->get();
 
         $messages = MessageResource::collection($messages);
 
@@ -185,16 +185,17 @@ class MessageController extends ApiController
      */
     private function getDialogWith($userId, $toId)
     {
-        $messages = Message::with('from', 'to')
-                            ->where(function ($query) use ($userId, $toId) {
-                                $query->where('from_id', $userId)
-                                        ->where('to_id', $toId);
-                            })
-                            ->orWhere(function ($query) use ($userId, $toId) {
-                                $query->where('from_id', $toId)
-                                    ->where('to_id', $userId);
-                            })
-                            ->get();
+        $messages = Message::with(['from', 'to'])
+            ->where(function ($query) use ($userId, $toId) {
+                $query->where('from_id', $userId)
+                    ->where('to_id', $toId);
+            })
+            ->orWhere(function ($query) use ($userId, $toId) {
+                $query->where('from_id', $toId)
+                    ->where('to_id', $userId);
+            })
+            ->orderBy('created_at', 'DESC')
+            ->get();
 
         $messages = MessageResource::collection($messages);
 
