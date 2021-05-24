@@ -25,6 +25,8 @@ class AlterMessagesTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('messages', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 }
