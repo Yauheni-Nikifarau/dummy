@@ -4,10 +4,12 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\IndexMessageRequest;
 use App\Http\Resources\MessageResource;
+use App\Mail\DialogueStart;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class MessageController extends ApiController
@@ -47,7 +49,7 @@ class MessageController extends ApiController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'to' => 'required|integer|exists:user,id',
+            'to' => 'required|integer|exists:users,id',
             'subject' => 'string|max:255|nullable',
             'text' => 'required|string|max:2000',
         ]);
@@ -67,8 +69,15 @@ class MessageController extends ApiController
         $message->text = $request->input('text');
         $message->subject = $request->input('subject');
 
+        $savingResult = $message->save();
 
-        if ($message->save()) {
+        if ($savingResult) {
+
+            if ($this->isFirstMessage($userId, $toUser->id)) {
+                //dd(123);
+                $this->sendEmailToRecepientAboutDialogueStart($toUser->id, $userId);
+            }
+            //dd(321);
             return response([
                 'success' => true,
                 'message' => "Your message to {$toUser->name} {$toUser->surname} has been sent",
@@ -186,6 +195,25 @@ class MessageController extends ApiController
         $messages = MessageResource::collection($messages);
 
         return $messages;
+    }
+
+    /**
+     * Checking if it was the first message to receiver
+     *
+     * @param $from_id
+     * @param $to_id
+     * @return bool
+     */
+    private function isFirstMessage($from_id, $to_id)
+    {
+        $numberOfMessages = Message::where('from_id', $from_id)->where('to_id', $to_id)->get()->count('id');
+        //dd($numberOfMessages);
+        return $numberOfMessages == 1;
+    }
+
+    private function sendEmailToRecepientAboutDialogueStart($toUserId, $fromUserId)
+    {
+        Mail::to(User::find($toUserId))->send(new DialogueStart($toUserId, $fromUserId));
     }
 
 
