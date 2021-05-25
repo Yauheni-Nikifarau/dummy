@@ -7,6 +7,7 @@ use App\Models\Message;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Mail;
 
 class MessagesNoticeCommand extends Command
@@ -25,15 +26,6 @@ class MessagesNoticeCommand extends Command
      */
     protected $description = 'Notice users about unread messages';
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Execute the console command.
@@ -42,9 +34,10 @@ class MessagesNoticeCommand extends Command
      */
     public function handle()
     {
-        $messages = Message::where('read', null)->where('noticed', null)->get();
+        /** @var  $messages Collection */
+        $messages = Message::whereNull('read')->whereNull('noticed')->get();
 
-        foreach ($messages as $message) {
+        $messages->each(function ($message, $key) {
             $interval = Carbon::now()->diffInHours($message->created_at);
 
             if ($interval >= 1) {
@@ -52,6 +45,6 @@ class MessagesNoticeCommand extends Command
 
                 $message->update(['noticed' => true]);
             }
-        }
+        });
     }
 }

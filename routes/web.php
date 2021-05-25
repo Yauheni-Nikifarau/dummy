@@ -1,9 +1,5 @@
 <?php
 
-use App\Mail\DialogueStart;
-use App\Mail\NoticeMessage;
-use App\Models\User;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 /*
