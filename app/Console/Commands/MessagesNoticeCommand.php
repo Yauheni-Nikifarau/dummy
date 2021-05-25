@@ -34,7 +34,6 @@ class MessagesNoticeCommand extends Command
      */
     public function handle()
     {
-        /** @var  $messages Collection */
         $messages = Message::whereNull('read')->whereNull('noticed')->get();
 
         $messages->each(function ($message, $key) {
