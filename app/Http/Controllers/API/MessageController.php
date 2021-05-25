@@ -74,10 +74,9 @@ class MessageController extends ApiController
         if ($savingResult) {
 
             if ($this->isFirstMessage($userId, $toUser->id)) {
-                //dd(123);
                 $this->sendEmailToRecepientAboutDialogueStart($toUser->id, $userId);
             }
-            //dd(321);
+
             return response([
                 'success' => true,
                 'message' => "Your message to {$toUser->name} {$toUser->surname} has been sent",
@@ -207,7 +206,6 @@ class MessageController extends ApiController
     private function isFirstMessage($from_id, $to_id)
     {
         $numberOfMessages = Message::where('from_id', $from_id)->where('to_id', $to_id)->get()->count('id');
-        //dd($numberOfMessages);
         return $numberOfMessages == 1;
     }
 
