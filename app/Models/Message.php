@@ -10,6 +10,10 @@ class Message extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $fillable = [
+            'noticed'
+    ];
+
     public function from()
     {
         return $this->belongsTo(User::class, 'from_id');
