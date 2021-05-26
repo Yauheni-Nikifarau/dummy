@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Resources\OrderResource;
+use App\Mail\OrderReport;
 use App\Models\Order;
 use App\Models\Trip;
 use Carbon\Carbon;
-use DateInterval;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Response;
+use PhpOffice\PhpWord\TemplateProcessor;
 
 
 class OrderController extends ApiController
@@ -60,7 +63,7 @@ class OrderController extends ApiController
             return $this->responseError('This trip has been booked', 400);
         }
 
-        $reservation_expires = (new \Carbon\Carbon)->addDays(3);
+        $reservation_expires = Carbon::now()->addDays(3);
 
         try {
 
@@ -139,5 +142,37 @@ class OrderController extends ApiController
     public function destroy($id)
     {
         //
+    }
+
+    public function report(Request $request, $id)
+    {
+        $user = auth()->user();
+
+        $order = Order::with([
+                    'trip' => function (BelongsTo $query) {
+                        $query->with(['hotel']);
+                    },
+                    'user'
+                ])->find($id);
+
+
+        if (!$order) {
+            return $this->responseError('there is no trip with such id', 400);
+        }
+
+        if ($order->user != $user) {
+            return $this->responseError('It is no your trip', 400);
+        }
+
+        $fileFullPath = $order->createReport();
+
+        $sendViaEmail = $request->input('send_via_email');
+
+        if ($sendViaEmail == 'true') {
+            Mail::to($user)->send(new OrderReport($fileFullPath));
+            return $this->responseSuccess([], 'Check your email box');
+        } else {
+            return Response::download($fileFullPath);
+        }
     }
 }
