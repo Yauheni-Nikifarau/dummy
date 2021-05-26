@@ -31,7 +31,7 @@ class OrderReport extends Mailable
     {
         return $this->markdown('mails.order_report')
             ->attach($this->filePath, [
-                'as' => 'Your order status.docx'
+                'as' => 'Your_order_status.docx'
             ]);
     }
 }

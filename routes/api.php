@@ -19,9 +19,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth')->group(function () {
-    Route::resource('orders', OrderController::class);
-    Route::get('orders/{id}/report', [OrderController::class, 'report']);
+Route::middleware('auth')->prefix('orders')->group(function () {
+    Route::resource('/', OrderController::class);
+    Route::get('/{id}/report', [OrderController::class, 'report']);
 });
 
 Route::resource('trips', TripController::class);

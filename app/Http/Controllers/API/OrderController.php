@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Response;
 use PhpOffice\PhpWord\TemplateProcessor;
 
 
@@ -163,37 +164,15 @@ class OrderController extends ApiController
             return $this->responseError('It is no your trip', 400);
         }
 
-        $paid = $order->paid ? 'Yes' : 'No';
+        $fileFullPath = $order->createReport();
 
-        $imageFileName = str_replace('storage//', '', $order->trip->image);
-        $imagePath = storage_path('app/public') . '/' . $imageFileName;
+        $sendViaEmail = $request->input('send_via_email');
 
-        $template = new TemplateProcessor('template.docx');
-
-        $template->setValue('name', $user->name);
-        $template->setValue('surname', $user->surname);
-        $template->setValue('orderId', $order->id);
-        $template->setValue('hotelName', $order->trip->hotel->name);
-        $template->setValue('hotelCountry', $order->trip->hotel->country);
-        $template->setValue('dateIn', $order->trip->date_in);
-        $template->setValue('dateOut', $order->trip->date_out);
-        $template->setValue('orderCreatedAt', $order->created_at);
-        $template->setValue('price', $order->price);
-        $template->setValue('paid', $paid);
-        $template->setImageValue('image', $imagePath);
-
-        $filename = "dummy_order_{$user->name}_{$user->surname}_{$id}_" . Carbon::now()->format('Y-m-d_H:i:s');
-        $fileFullPath = storage_path('app/public/ordersReports') . '/' . $filename . '.docx';
-
-        $template->saveAs($fileFullPath);
-
-        $sendViaEmail = $request->input('send_via_email') ?? null;
-
-        if ($sendViaEmail == 'yes') {
+        if ($sendViaEmail == 'true') {
             Mail::to($user)->send(new OrderReport($fileFullPath));
             return $this->responseSuccess([], 'Check your email box');
         } else {
-            return \Response::download($fileFullPath);
+            return Response::download($fileFullPath);
         }
     }
 }
