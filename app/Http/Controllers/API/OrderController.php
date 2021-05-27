@@ -7,14 +7,13 @@ use App\Mail\OrderReport;
 use App\Models\Order;
 use App\Models\Trip;
 use Carbon\Carbon;
-use Dompdf\Dompdf;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
 use PhpOffice\PhpWord\IOFactory;
-use PhpOffice\PhpWord\TemplateProcessor;
+use PhpOffice\PhpWord\Settings;
 
 
 class OrderController extends ApiController
@@ -170,13 +169,13 @@ class OrderController extends ApiController
 
         $sendViaEmail = $request->input('send_via_email');
 
-        $extension = $request->input('extension') ?? 'docx';
+        $extension = $request->input('extension', 'docx');
 
         if ($extension == 'pdf') {
             $phpWord = IOFactory::load($fileFullPath, 'Word2007');
             $domPdfPath = base_path( 'vendor/dompdf/dompdf');
-            \PhpOffice\PhpWord\Settings::setPdfRendererPath($domPdfPath);
-            \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
+            Settings::setPdfRendererPath($domPdfPath);
+            Settings::setPdfRendererName('DomPDF');
             $fileFullPath = str_replace('.docx', '.pdf', $fileFullPath);
             $phpWord->save($fileFullPath, 'PDF');
         }
