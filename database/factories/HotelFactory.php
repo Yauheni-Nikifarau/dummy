@@ -29,4 +29,14 @@ class HotelFactory extends Factory
             'city' => $this->faker->city()
         ];
     }
+
+    public function fakeLatitude()
+    {
+        return $this->faker->latitude;
+    }
+
+    public function fakeLongitude()
+    {
+        return $this->faker->longitude;
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Weather;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class HotelResource extends JsonResource
@@ -23,7 +24,8 @@ class HotelResource extends JsonResource
             'country'           => $this->country,
             'city'              => $this->city,
             'trips'             => TripResource::collection($this->whenLoaded('trips')),
-            'orders'            => OrderResource::collection($this->whenLoaded('orders'))
+            'orders'            => OrderResource::collection($this->whenLoaded('orders')),
+            'weather'           => Weather::getWeather($this->latitude, $this->longitude),
         ];
     }
 }

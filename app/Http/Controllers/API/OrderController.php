@@ -145,6 +145,13 @@ class OrderController extends ApiController
         //
     }
 
+    /**
+     * Download or sends by email an order's report file in necessary extension
+     *
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
     public function report(Request $request, $id)
     {
         $user = auth()->user();

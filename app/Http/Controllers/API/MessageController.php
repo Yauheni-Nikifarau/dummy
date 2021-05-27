@@ -209,6 +209,12 @@ class MessageController extends ApiController
         return $numberOfMessages == 1;
     }
 
+    /**
+     * Sends a mail to User with $toUserId ID about starting a conversation with User with $fromUserId ID
+     *
+     * @param $toUserId
+     * @param $fromUserId
+     */
     private function sendEmailToRecepientAboutDialogueStart($toUserId, $fromUserId)
     {
         Mail::to(User::find($toUserId))->send(new DialogueStart($toUserId, $fromUserId));

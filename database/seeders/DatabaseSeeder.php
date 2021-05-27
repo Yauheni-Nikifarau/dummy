@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
         $this->call(TripsTableSeeder::class);
         $this->call(TagsAssignsTableSeeder::class);
         $this->call(OrdersTableSeeder::class);
+        $this->call(HotelsLatLonSeeder::class);
 
 
 
