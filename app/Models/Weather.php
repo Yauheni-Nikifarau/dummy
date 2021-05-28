@@ -20,8 +20,6 @@ class Weather
      */
     public static function getWeather ($lat, $lon)
     {
-        Cache::flush();
-
         $today = Carbon::today()->getTimestamp();
 
         $cacheKey = "{$today}_{$lat}_{$lon}";
