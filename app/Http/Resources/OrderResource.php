@@ -6,6 +6,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderResource extends JsonResource
 {
+    /**
+     * Transform the resource with information
+     * about Order, it's trip, it's user
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return array
+     */
     public function toArray ($request)
     {
         return [

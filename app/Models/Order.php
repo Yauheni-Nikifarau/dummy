@@ -11,16 +11,31 @@ class Order extends Model
 {
     use HasFactory;
 
+    /**
+     * returns information about it's order trip
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function trip()
     {
         return $this->belongsTo(Trip::class);
     }
 
+    /**
+     * returns information about it's order user
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Create and save as docx file report about order
+     *
+     * @return string
+     */
     public function createReport ()
     {
         $user = auth()->user();

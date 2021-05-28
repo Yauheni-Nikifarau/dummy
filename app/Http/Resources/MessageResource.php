@@ -7,6 +7,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class MessageResource extends JsonResource
 {
     /**
+     * Transform the resource with information
+     * about Message and about sender and recipient.
+     *
      * @param \Illuminate\Http\Request $request
      * @return array
      */

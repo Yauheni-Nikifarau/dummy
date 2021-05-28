@@ -44,16 +44,29 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * returns all sends messages
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function messagesFrom()
     {
         return $this->hasMany(Message::class, 'from_id');
     }
 
+    /**
+     * returns all received messages
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function messagesTo()
     {
         return $this->hasMany(Message::class, 'to_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function orders()
     {
         return $this->hasMany(Order::class);

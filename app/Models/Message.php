@@ -14,11 +14,21 @@ class Message extends Model
             'noticed'
     ];
 
+    /**
+     * Returns information about sender
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo|\Illuminate\Database\Query\Builder
+     */
     public function from()
     {
         return $this->belongsTo(User::class, 'from_id');
     }
 
+    /**
+     * Returns information about recipient
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function to()
     {
         return $this->belongsTo(User::class, 'to_id');
