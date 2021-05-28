@@ -25,7 +25,7 @@ class HotelResource extends JsonResource
             'city'              => $this->city,
             'trips'             => TripResource::collection($this->whenLoaded('trips')),
             'orders'            => OrderResource::collection($this->whenLoaded('orders')),
-            'weather'           => Weather::getWeather($this->latitude, $this->longitude),
+            'weather'           => $this->weather(),
         ];
     }
 }

@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
-class Weather extends Model
+class Weather
 {
+    const url = "https://api.openweathermap.org/data/2.5/onecall";
+
     /**
      * Returns 7-day weather forecast for given geolocation from cache or from weather API
      *
@@ -18,6 +20,8 @@ class Weather extends Model
      */
     public static function getWeather ($lat, $lon)
     {
+        Cache::flush();
+
         $today = Carbon::today()->getTimestamp();
 
         $cacheKey = "{$today}_{$lat}_{$lon}";
@@ -27,6 +31,11 @@ class Weather extends Model
         }
 
         $response = self::getWeatherFromApi($lat, $lon);
+
+        if (!$response) {
+            return null;
+        }
+
         $data = self::transformWeatherData($response);
         Cache::put($cacheKey, $data);
 
@@ -43,7 +52,19 @@ class Weather extends Model
     private static function getWeatherFromApi ($lat, $lon)
     {
         $key = config('api.weatherKey');
-        $response = Http::get("https://api.openweathermap.org/data/2.5/onecall?lat={$lat}&lon={$lon}&exclude=hourly,minutely&units=metric&appid={$key}");
+
+        if (!$key) {
+            Log::error('Api key is not installed in your application');
+            return null;
+        }
+
+        $response = Http::get(self::url, [
+            'lat' => $lat,
+            'lon' => $lon,
+            'appid' => $key,
+            'units' => 'metric',
+            'exclude' => 'hourly,minutely',
+        ]);
         $response = $response->json();
         return $response;
     }
@@ -60,7 +81,7 @@ class Weather extends Model
         $response = [];
         foreach ($data as $dayData) {
             $response[] = [
-                'date' => Carbon::createFromTimestamp($dayData["dt"])->format('Y-m-d'),
+                'date' => Carbon::parse($dayData["dt"])->format('Y-m-d'),
                 'weatherShort' => $dayData['weather'][0]['main'],
                 'weatherFull' => $dayData['weather'][0]['description'],
                 'pressure' => $dayData['pressure'],

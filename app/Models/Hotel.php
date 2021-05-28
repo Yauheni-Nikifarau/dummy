@@ -28,4 +28,15 @@ class Hotel extends Model
     {
         return $this->hasManyThrough(Order::class, Trip::class);
     }
+
+    /**
+     * returns 7-days weather forecast for hotel's area
+     *
+     * @return array|mixed|null
+     */
+    public function weather()
+    {
+        $weather = Weather::getWeather($this->latitude, $this->longitude);
+        return $weather;
+    }
 }
