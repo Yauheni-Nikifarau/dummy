@@ -14,8 +14,8 @@ class AlterHotelTableGeo extends Migration
     public function up()
     {
         Schema::table('hotels', function (Blueprint $table) {
-            $table->float('latitude');
-            $table->float('longitude');
+            $table->float('latitude')->nullable();
+            $table->float('longitude')->nullable();
         });
     }
 
