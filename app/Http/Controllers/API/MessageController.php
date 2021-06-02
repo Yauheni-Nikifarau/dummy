@@ -48,8 +48,9 @@ class MessageController extends ApiController
      */
     public function store(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
-            'to' => 'required|integer|exists:users,id',
+            'to_id' => 'required|integer|exists:users,id',
             'subject' => 'string|max:255|nullable',
             'text' => 'required|string|max:2000',
         ]);
@@ -58,9 +59,9 @@ class MessageController extends ApiController
             return $this->responseError('Wrong parameters', 400, $validator->errors());
         }
 
-        $userId = auth()->id();
+        $userId = $request->input('from_id', auth()->id());
 
-        $toUser = User::find($request->input('to'));
+        $toUser = User::find($request->input('to_id'));
 
         $message = new Message();
 
@@ -70,6 +71,7 @@ class MessageController extends ApiController
         $message->subject = $request->input('subject');
 
         $savingResult = $message->save();
+
 
         if ($savingResult) {
 

@@ -15,12 +15,20 @@ Route::group([
 
     $router->resource('users', UsersController::class);
 
-    //$router->resource('messages', MessageController::class);
+    $router->prefix('messages')->group(function (Router $internalRouter) {
+        $internalRouter->get('received', 'MessageController@receivedMessages');
 
-    $router->get('messages/received', 'MessageController@received');
+        $internalRouter->get('sent', 'MessageController@sentMessages');
 
-    $router->get('messages/sent', 'MessageController@sent');
+        $internalRouter->get('received/create', 'MessageController@writeNewMessage');
 
-    $router->get('message/write/{id}', 'MessageController@writeMessage')->name('writeMessage');
+        $internalRouter->get('sent/create', 'MessageController@writeNewMessage');
+
+        $internalRouter->get('write/{id}', 'MessageController@writeAnswerMessage');
+
+        $internalRouter->post('sent', 'MessageController@saveMessage');
+    });
+
+    $router->get('find/users', 'MessageController@findUsersByEmail');
 
 });
