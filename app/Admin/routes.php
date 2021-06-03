@@ -32,5 +32,8 @@ Route::group([
     });
 
     $router->get('find/users', 'MessageController@findUsersByEmail');
+    $router->get('find/hotels', 'TripController@findHotelsByName');
+    $router->get('find/discounts', 'TripController@findDiscountsByValue');
+
 
 });

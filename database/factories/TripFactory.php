@@ -41,7 +41,7 @@ class TripFactory extends Factory
             'hotel_id'             => $this->faker->numberBetween(1, 20),
             'reservation'          => false,
             'discount_id'          => $this->faker->randomElement([null, $this->faker->numberBetween(1,5)]),
-            'image'                => 'storage/' . str_replace(storage_path('app/public'), '', $imagePath)
+            'image'                => str_replace(storage_path('app/public/'), '', $imagePath)
         ];
     }
 }

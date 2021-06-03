@@ -2,12 +2,16 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Discount;
+use App\Models\Hotel;
+use App\Models\Tag;
 use App\Models\Trip;
 use Carbon\Carbon;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
+use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\Hash;
 
 class TripController extends AdminController
 {
@@ -18,6 +22,31 @@ class TripController extends AdminController
      */
     protected $title = 'Trip';
 
+
+    /**
+     * Responds to AJAX request from Trip Creating or editing Form When user write something in "Hotel" field
+     *
+     * @return mixed
+     */
+    public function findHotelsByName()
+    {
+        $q = request()->input('q', null);
+
+        return Hotel::where('name', 'like', "%$q%")->paginate(null, ['id', 'name as text']);
+    }
+
+    /**
+     * Responds to AJAX request from Trip Creating or editing Form When user write something in "Discount" field
+     *
+     * @return mixed
+     */
+    public function findDiscountsByValue()
+    {
+        $q = request()->input('q', null);
+
+        return Discount::where('value', 'like', "%$q%")->paginate(null, ['id', 'value as text']);
+    }
+
     /**
      * Make a grid builder.
      *
@@ -27,59 +56,94 @@ class TripController extends AdminController
     {
         $grid = new Grid(new Trip());
 
-        $grid->column('id', __('ID'));
-        $grid->column('name', __('Name'))->filter('like');
-        $grid->column('price', __('Price'))->filter('range');
+        $grid->column('id', __('ID'))->sortable();
+
+        $grid->column('name', __('Name'))->modal('Trip', function ($model) {
+            $props = [
+                'image' => $this->image,
+                'tags' => $this->tags,
+            ];
+            return view('admin.tripInfo', $props);
+        });;
+
+        $grid->column('price', __('Price'))->sortable();
+
         $grid->column('date_in', __('Date in'))->display(function () {
             return Carbon::parse($this->date_in)->format('Y-m-d');
-        })->filter('range', 'datetime');
+        })->sortable();
+
         $grid->column('date_out', __('Date out'))->display(function () {
             return Carbon::parse($this->date_out)->format('Y-m-d');
-        })->filter('range', 'datetime');
-        $grid->column('quantity_of_people', __('Quantity of people'))->filter('range');
+        })->sortable();
+
+        $grid->column('quantity_of_people', __('Quantity of people'))->sortable();
+
         $grid->column('hotel', __('Hotel'))->display(function () {
             return $this->hotel->name;
-        })->filter('like');
+        });
+
         $grid->column('country', 'Country')->display(function () {
-            return $this->hotel->country;
-        })->filter('like');
-        $grid->column('meal_option', __('Meal option'))->filter();
-        $grid->column('reservation', __('Reservation'))->bool()->filter();
+            return $this->hotel->country . "({$this->hotel->city})";
+        });
+
+        $grid->column('meal_option', __('Meal option'));
+
+        $grid->column('reservation', __('Reservation'))->bool()->filter([
+            0 => 'Free',
+            1 => 'Booked',
+        ]);
+
         $grid->column('discount', __('Discount'))->display(function () {
             if (isset($this->discount->value)) {
                 return $this->discount->value . '%';
             }
-        })->filter('like');
+        });
+
+        $grid->column('price_with_discount', __('Price with discount'))->display(function () {
+            if (isset($this->discount->value)) {
+                $endPrice = $this->price * ((100 - $this->discount->value) / 100);
+                return number_format($endPrice, 2);
+            }
+        });
+
+        $grid->filter(function ($filter) {
+
+            $filter->disableIdFilter();
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->like('name', 'Name');
+                $filter->between('price', 'Price');
+                $filter->between('date_in', 'Date in')->datetime();
+                $filter->between('date_out', 'Date out')->datetime();
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('quantity_of_people', 'Quantity of people')->decimal();
+                $filter->like('meal_option', 'Meal Option');
+                $filter->where(function ($query) {
+
+                    $query->whereHas('hotel', function ($query) {
+                        $query->where('name', 'like', "%{$this->input}%");
+                    });
+
+                }, 'Hotel');
+                $filter->where(function ($query) {
+
+                    $query->whereHas('hotel', function ($query) {
+                        $query->where('country', 'like', "%{$this->input}%");
+                    });
+
+                }, 'Country');
+            });
+        });
+
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+        });
 
         return $grid;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
-    protected function detail($id)
-    {
-        $show = new Show(Trip::findOrFail($id));
-
-        $show->field('id', __('Id'));
-        $show->field('name', __('Name'));
-        $show->field('price', __('Price'));
-        $show->field('date_in', __('Date in'));
-        $show->field('date_out', __('Date out'));
-        $show->field('quantity_of_people', __('Quantity of people'));
-        $show->field('hotel_id', __('Hotel id'));
-        $show->field('meal_option', __('Meal option'));
-        $show->field('reservation', __('Reservation'));
-        $show->field('discount_id', __('Discount id'));
-        $show->field('image', __('Image'));
-        $show->field('created_at', __('Created at'));
-        $show->field('updated_at', __('Updated at'));
-
-        return $show;
-    }
 
     /**
      * Make a form builder.
@@ -90,16 +154,32 @@ class TripController extends AdminController
     {
         $form = new Form(new Trip());
 
-        $form->text('name', __('Name'));
-        $form->decimal('price', __('Price'));
-        $form->datetime('date_in', __('Date in'))->default(date('Y-m-d H:i:s'));
-        $form->datetime('date_out', __('Date out'))->default(date('Y-m-d H:i:s'));
-        $form->number('quantity_of_people', __('Quantity of people'));
-        $form->number('hotel_id', __('Hotel id'));
+        $form->text('name', __('Name'))->rules('required');
+        $form->decimal('price', __('Price'))->rules('required');
+        $form->date('date_in', __('Date in'))->default(Carbon::today())->rules('required');
+        $form->date('date_out', __('Date out'))->default(Carbon::today())->rules('required');
+        $form->number('quantity_of_people', __('Quantity of people'))->rules('min:1|max:2');
+
+        $form->select('hotel_id', 'Hotel')->options(function ($id) {
+            $hotel = Hotel::find($id);
+
+            if ($hotel) {
+                return [$hotel->id => "{$hotel->name} ({$hotel->country})"];
+            }
+        })->ajax('/admin/find/hotels');
+
         $form->text('meal_option', __('Meal option'));
-        $form->switch('reservation', __('Reservation'));
-        $form->number('discount_id', __('Discount id'));
-        $form->image('image', __('Image'));
+        $form->select('discount_id', 'Discount')->options(function ($id) {
+            $discount = Discount::find($id);
+
+            if ($discount) {
+                return [$discount->id => $discount->value . '%'];
+            }
+        })->ajax('/admin/find/discounts');
+
+        $form->radio('reservation', 'Reservation')->options([true => 'booked', false => 'free'])->default(false);
+        $form->multipleSelect('tags', 'Tags')->options(Tag::all()->pluck('tag_name', 'id'));
+        $form->image('image', __('Image'))->move('tripsWallpapers');
 
         return $form;
     }
