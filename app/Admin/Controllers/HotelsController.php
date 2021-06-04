@@ -40,11 +40,20 @@ class HotelsController extends AdminController
             return view('admin.hotelTripsInfo', $props);
         });;
         $grid->column('stars', __('Stars'));
-        $grid->column('country', __('Country'));
-        $grid->column('city', __('City'));
+        $grid->column('country', __('Country'))->sortable();
+        $grid->column('city', __('City'))->sortable();
 
-        $grid->disableFilter();
         $grid->disableExport();
+
+        $grid->filter(function($filter){
+            $filter->disableIdFilter();
+            $filter->like('name', 'name');
+            $filter->like('country', 'country');
+            $filter->like('city', 'city');
+            $filter->between('stars', 'stars');
+        });
+
+
 
         return $grid;
     }
