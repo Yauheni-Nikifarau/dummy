@@ -88,7 +88,7 @@ class AdminTablesSeeder extends Seeder
                 'order'     => 3,
                 'title'     => 'Users',
                 'icon'      => 'fa-users',
-                'uri'       => 'auth/users',
+                'uri'       => 'users',
             ],
             [
                 'parent_id' => 2,
@@ -117,6 +117,34 @@ class AdminTablesSeeder extends Seeder
                 'title'     => 'Operation log',
                 'icon'      => 'fa-history',
                 'uri'       => 'auth/logs',
+            ],
+            [
+                'parent_id' => 0,
+                'order'     => 0,
+                'title'     => 'Messages',
+                'icon'      => 'fa-wechat',
+                'uri'       => 'messages',
+            ],
+            [
+                'parent_id' => 8,
+                'order'     => 0,
+                'title'     => 'Received',
+                'icon'      => 'fa-mail-reply',
+                'uri'       => 'messages/received',
+            ],
+            [
+                'parent_id' => 8,
+                'order'     => 0,
+                'title'     => 'Sent',
+                'icon'      => 'fa-mail-forward',
+                'uri'       => 'messages/sent',
+            ],
+            [
+                'parent_id' => 0,
+                'order'     => 0,
+                'title'     => 'Trips',
+                'icon'      => 'fa-plane',
+                'uri'       => 'trips',
             ],
         ]);
 

@@ -21,4 +21,5 @@
 Encore\Admin\Form::forget(['map', 'editor']);
 Admin::css('css/reset.css');
 Admin::css('css/message.css');
+Admin::css('css/trip.css');
 
