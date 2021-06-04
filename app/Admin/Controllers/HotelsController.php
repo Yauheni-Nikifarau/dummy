@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Hotel;
+use Carbon\Carbon;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -26,16 +27,24 @@ class HotelsController extends AdminController
     {
         $grid = new Grid(new Hotel());
 
-        $grid->column('id', __('Id'));
-        $grid->column('name', __('Name'));
-        $grid->column('description', __('Description'));
+        $grid->column('name', __('Name'))->modal('Trips', function ($model) {
+            $props = [
+                'hotelDescription' => html_entity_decode(htmlentities($this->description)),
+                'hotelName' => $this->name,
+                'trips' => $this->trips,
+            ];
+            $props['trips']->each(function ($trip, $key) {
+                $trip->date_in = Carbon::parse($trip->date_in)->format('Y-m-d');
+                $trip->date_out = Carbon::parse($trip->date_out)->format('Y-m-d');
+            });
+            return view('admin.hotelTripsInfo', $props);
+        });;
         $grid->column('stars', __('Stars'));
         $grid->column('country', __('Country'));
         $grid->column('city', __('City'));
-        $grid->column('created_at', __('Created at'));
-        $grid->column('updated_at', __('Updated at'));
-        $grid->column('latitude', __('Latitude'));
-        $grid->column('longitude', __('Longitude'));
+
+        $grid->disableFilter();
+        $grid->disableExport();
 
         return $grid;
     }
@@ -50,14 +59,11 @@ class HotelsController extends AdminController
     {
         $show = new Show(Hotel::findOrFail($id));
 
-        $show->field('id', __('Id'));
         $show->field('name', __('Name'));
         $show->field('description', __('Description'));
         $show->field('stars', __('Stars'));
         $show->field('country', __('Country'));
         $show->field('city', __('City'));
-        $show->field('created_at', __('Created at'));
-        $show->field('updated_at', __('Updated at'));
         $show->field('latitude', __('Latitude'));
         $show->field('longitude', __('Longitude'));
 
@@ -74,7 +80,7 @@ class HotelsController extends AdminController
         $form = new Form(new Hotel());
 
         $form->text('name', __('Name'));
-        $form->textarea('description', __('Description'));
+        $form->summernote('description', __('Description'));
         $form->number('stars', __('Stars'));
         $form->text('country', __('Country'));
         $form->text('city', __('City'));
