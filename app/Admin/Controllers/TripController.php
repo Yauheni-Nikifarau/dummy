@@ -168,7 +168,7 @@ class TripController extends AdminController
             }
         })->ajax('/admin/find/hotels');
 
-        $form->text('meal_option', __('Meal option'));
+        $form->select('meal_option', 'Meal option')->options(['OB' => 'OB', 'HB' => 'HB', 'FB' => 'FB', 'BB' => 'BB', 'AI' => 'AI']);
         $form->select('discount_id', 'Discount')->options(function ($id) {
             $discount = Discount::find($id);
 
