@@ -146,6 +146,13 @@ class AdminTablesSeeder extends Seeder
                 'icon'      => 'fa-plane',
                 'uri'       => 'trips',
             ],
+            [
+                'parent_id' => 0,
+                'order'     => 0,
+                'title'     => 'Orders',
+                'icon'      => 'fa-shopping-cart',
+                'uri'       => 'orders',
+            ],
         ]);
 
         // add role to menu.
