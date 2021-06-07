@@ -17,6 +17,8 @@ Route::group([
 
     $router->resource('trips', TripController::class);
 
+    $router->resource('orders', OrdersController::class);
+
     $router->prefix('messages')->group(function (Router $internalRouter) {
         $internalRouter->get('received', 'MessageController@receivedMessages');
 
