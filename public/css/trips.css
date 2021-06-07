@@ -1,0 +1,63 @@
+.show-hotelTrips-container {
+    width: 85%;
+    margin: 0 auto;
+}
+
+.show-hotelTrips-list {
+    max-height: 700px;
+    overflow: scroll;
+}
+
+.show-hotelTrips-list_item {
+    border: 1px solid grey;
+    padding: 5px;
+    margin: 20px 0;
+    height: 210px;
+    display: grid;
+    grid-template-columns: 200px 2fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    gap: 0px 50px;
+    grid-template-areas:
+    "image name name"
+    "image dates dates"
+    "image price price"
+    "image . link";
+}
+
+.show-hotelTrips-list_item span {
+    font-weight: bold;
+}
+
+.show-hotelTrips-image {
+    grid-area: image;
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+}
+
+.show-hotelTrips-name {
+    grid-area: name;
+}
+
+.show-hotelTrips-dates {
+    grid-area: dates;
+}
+
+.show-hotelTrips-price {
+    grid-area: price;
+}
+
+.show-hotelTrips-link {
+    grid-area: link;
+    display: block;
+    width: 70px;
+    height: 30px;
+    border-radius: 3px;
+    background-color: #111293;
+    color: #FFFFFF;
+    font-weight: bold;
+    font-size: 20px;
+    text-transform: uppercase;
+    text-align: center;
+}
+

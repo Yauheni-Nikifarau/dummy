@@ -396,6 +396,12 @@ return [
     |
     */
     'extensions' => [
-
+        'summernote' => [
+            'enable' => true,
+            'config' => [
+                'lang'   => 'en-US',
+                'height' => 300,
+            ]
+        ]
     ],
 ];
