@@ -21,6 +21,8 @@ Route::group([
 
     $router->resource('orders', OrdersController::class);
 
+    $router->resource('tags', TagsController::class);
+
     $router->prefix('messages')->group(function (Router $internalRouter) {
         $internalRouter->get('received', 'MessageController@receivedMessages');
 
