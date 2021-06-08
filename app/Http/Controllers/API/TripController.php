@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TripResource;
+use App\Models\Discount;
 use App\Models\Tag;
 use App\Models\Trip;
 use Carbon\Carbon;
@@ -124,14 +125,33 @@ class TripController extends ApiController
         }
 
         if ($request->exists('tag')) {
-            preg_match('/_[0-9]+$/', $request->input('tag'), $matches);
-            $tag_id = substr(end($matches),1);
-            $trips_array = Tag::find($tag_id)->trips ?? [];
+            $tag_name = str_replace('_', ' ', $request->input('tag'));
+            $tag = Tag::with(['trips'])->where('tag_name', $tag_name)->first();
+            $trips_array = $tag->trips ?? [];
             $arrayOfTripsId = [];
             foreach ($trips_array as $trip) {
                 $arrayOfTripsId[] = $trip->id;
             }
             $trips->whereIn('id', $arrayOfTripsId);
+        }
+
+        if ($request->exists('discount')) {
+            $discount = Discount::with(['trips'])->where('value', $request->input('discount'))->first();
+            $trips_array = $discount->trips ?? [];
+            $arrayOfTripsId = [];
+            foreach ($trips_array as $trip) {
+                $arrayOfTripsId[] = $trip->id;
+            }
+            $trips->whereIn('id', $arrayOfTripsId);
+        }
+
+        if ($request->exists('order')) {
+            $direction = $request->input('direction', 'asc');
+            $trips->orderBy($request->input('order', $direction));
+        }
+
+        if ($request->exists('limit')) {
+            $trips->limit($request->input('limit'));
         }
 
         $trips = $trips->get();

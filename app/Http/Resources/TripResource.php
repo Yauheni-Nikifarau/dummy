@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class TripResource extends JsonResource
@@ -18,8 +19,8 @@ class TripResource extends JsonResource
             'id'                    => $this->id,
             'name'                  => $this->name,
             'price'                 => $this->price,
-            'date_in'               => $this->date_in,
-            'date_out'              => $this->date_out,
+            'date_in'               => Carbon::parse($this->date_in)->format('Y-m-d'),
+            'date_out'              => Carbon::parse($this->date_out)->format('Y-m-d'),
             'hotel'                 => new HotelResource($this->whenLoaded('hotel')),
             'meal_option'           => $this->meal_option,
             'discount'              => $this->discount ?? null,
