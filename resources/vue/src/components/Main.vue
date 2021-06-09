@@ -23,16 +23,14 @@
 
         <div class="album py-5 bg-light">
             <div class="container">
-
+                <!--                <Tripsgroup></Tripsgroup>-->
+                <!--                <Tripsgroup></Tripsgroup>-->
+                <!--                <Tripsgroup></Tripsgroup>-->
                 <h1 class="mt-5 text-primary ">The latest offers</h1>
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
                     <TripCardItem v-for="trip in latestList"
                                   :key="trip.id"
-                                  :img-src="apiRootForImages + trip.image"
-                                  :title="trip.name"
-                                  :price="trip.price"
-                                  :date-in="trip.date_in"
-                                  :date-out="trip.date_out">
+                                  :trip="trip">
                     </TripCardItem>
                 </div>
 
@@ -40,11 +38,7 @@
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
                     <TripCardItem v-for="trip in hotList"
                                   :key="trip.id"
-                                  :img-src="apiRootForImages + trip.image"
-                                  :title="trip.name"
-                                  :price="trip.price"
-                                  :date-in="trip.date_in"
-                                  :date-out="trip.date_out">
+                                  :trip="trip">
                     </TripCardItem>
                 </div>
 
@@ -52,11 +46,7 @@
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
                     <TripCardItem v-for="trip in offList"
                                   :key="trip.id"
-                                  :img-src="apiRootForImages + trip.image"
-                                  :title="trip.name"
-                                  :price="trip.price"
-                                  :date-in="trip.date_in"
-                                  :date-out="trip.date_out">
+                                  :trip="trip">
                     </TripCardItem>
                 </div>
             </div>
@@ -67,60 +57,94 @@
 
 <script>
 import TripCardItem from './TripCardItem.vue';
-
-const tripsUrl = process.env.VUE_APP_API_ROOT_PATH + '/api/trips',
-    latestListUrl = tripsUrl + '?order=created_at&direction=desc&limit=3',
-    hotListUrl = tripsUrl + '?tag=hot_tour&order=created_at&direction=desc&limit=3',
-    offListUrl = tripsUrl + '?discount=35&order=created_at&direction=desc&limit=3';
-
+import { ref, onMounted } from "vue";
 
 export default {
-    name: "Main",
-    data() {
-        return {
-            latestList: [],
-            hotList: [],
-            offList: [],
-            apiRootForImages: process.env.VUE_APP_API_ROOT_PATH + '/storage/'
+
+
+    setup () {
+        const tripsUrl = process.env.VUE_APP_API_ROOT_PATH + '/api/trips',
+            latestListUrl = tripsUrl + '?order=created_at&direction=desc&limit=3',
+            hotListUrl = tripsUrl + '?tag=hot_tour&order=created_at&direction=desc&limit=3',
+            offListUrl = tripsUrl + '?discount=35&order=created_at&direction=desc&limit=3';
+
+        const latestList = ref([]),
+            hotList = ref([]),
+            offList = ref([]);
+
+        const getTrips = async () => {
+            let response = await fetch(latestListUrl)
+            let json = await response.json();
+            latestList.value = json.data;
+
+            response = await fetch(hotListUrl)
+            json = await response.json();
+            hotList.value = json.data;
+
+            response = await fetch(offListUrl)
+            json = await response.json();
+            offList.value = json.data;
         }
+
+        onMounted(getTrips);
+
+        return {
+            latestList,
+            hotList,
+            offList,
+            getTrips
+        };
     },
+
     components: {
         TripCardItem
-    },
-    created() {
-        this.getLatestList();
-        this.getHotList();
-        this.getOffList();
-    },
-    methods: {
-        getLatestList: function () {
-            fetch(latestListUrl)
-                .then(response => response.json())
-                .then(json => {
-                    this.latestList = json.data;
-                });
-        },
-        getHotList: function () {
-            fetch(hotListUrl)
-                .then(response => response.json())
-                .then(json => {
-                    this.hotList = json.data;
-                });
-        },
-        getOffList: function () {
-            fetch(offListUrl)
-                .then(response => response.json())
-                .then(json => {
-                    this.offList = json.data;
-                });
-        }
     }
+
+    // name: "Main",
+    // data() {
+    //     return {
+    //         latestList: [],
+    //         hotList: [],
+    //         offList: [],
+    //     }
+    // },
+    // components: {
+    //     TripCardItem
+    // },
+    // mounted() {
+    //     this.getLatestList();
+    //     this.getHotList();
+    //     this.getOffList();
+    // },
+    // methods: {
+    //     getLatestList() {
+    //         fetch(latestListUrl)
+    //             .then(response => response.json())
+    //             .then(json => {
+    //                 this.latestList = json.data;
+    //             });
+    //     },
+    //     getHotList() {
+    //         fetch(hotListUrl)
+    //             .then(response => response.json())
+    //             .then(json => {
+    //                 this.hotList = json.data;
+    //             });
+    //     },
+    //     getOffList() {
+    //         fetch(offListUrl)
+    //             .then(response => response.json())
+    //             .then(json => {
+    //                 this.offList = json.data;
+    //             });
+    //     }
+    // }
 }
 </script>
 
 <style scoped>
-    .carousel-item img {
-        height: 400px;
-        object-fit: cover;
-    }
+.carousel-item img {
+    height: 400px;
+    object-fit: cover;
+}
 </style>
