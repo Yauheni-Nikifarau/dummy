@@ -18,13 +18,15 @@
 
 
 export default {
-    data() {
+    setup () {
         return {
             apiRootForImages: process.env.VUE_APP_API_ROOT_PATH + '/storage/'
         }
     },
-    name: "TripCardItem",
-    props: ['trip']
+    name: "trip-card-item",
+    props: {
+        trip: Object
+    }
 }
 </script>
 

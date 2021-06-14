@@ -21,12 +21,16 @@ class HotelFactory extends Factory
      */
     public function definition()
     {
+        $imagePath = $this->faker->image(storage_path('app/public/hotels'), 300, 300, 'hotel');
+
         return [
             'name' => $this->faker->words($this->faker->numberBetween(1,5), true),
             'description' => $this->faker->paragraphs($this->faker->numberBetween(1,5), true),
             'stars' => $this->faker->numberBetween(3,5),
             'country' => $this->faker->country(),
-            'city' => $this->faker->city()
+            'city' => $this->faker->city(),
+            'image' => str_replace(storage_path('app/public/'), '', $imagePath)
+
         ];
     }
 

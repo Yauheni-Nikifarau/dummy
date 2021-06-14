@@ -75,6 +75,7 @@ class HotelsController extends AdminController
         $show->field('city', __('City'));
         $show->field('latitude', __('Latitude'));
         $show->field('longitude', __('Longitude'));
+        $show->field('image', __('Image'));
 
         return $show;
     }
@@ -95,6 +96,7 @@ class HotelsController extends AdminController
         $form->text('city', __('City'));
         $form->decimal('latitude', __('Latitude'));
         $form->decimal('longitude', __('Longitude'));
+        $form->image('image', __('Image'))->move('hotels');
 
         return $form;
     }
