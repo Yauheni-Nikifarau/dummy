@@ -31,7 +31,7 @@ import Modal from "./Modal";
 
 export default {
     name: "register-modal",
-    components: {
+    component: {
         Shadow,
         Modal
     }

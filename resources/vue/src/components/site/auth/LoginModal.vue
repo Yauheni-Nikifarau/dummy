@@ -18,7 +18,7 @@ import Modal from "./Modal";
 import Shadow from "../common/Shadow";
 export default {
     name: "login-modal",
-    components: {
+    component: {
         Shadow,
         Modal
     }

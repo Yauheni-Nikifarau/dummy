@@ -1,8 +1,8 @@
 <template>
     <li>
-        <a :href="link" class="nav-link link-dark">
+        <router-link :to="link" class="nav-link link-dark">
             {{ title }}
-        </a>
+        </router-link>
     </li>
 </template>
 

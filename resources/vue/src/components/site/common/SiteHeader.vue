@@ -9,19 +9,19 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <li class="nav-item">
-                                <a class="nav-link hover:active" href="#">Main</a>
+                                <router-link class="nav-link hover:active" to="/">Main</router-link>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link hover:active" href="#">Trips</a>
+                                <router-link class="nav-link hover:active" to="/trips">Trips</router-link>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link hover:active" href="#">Hotels</a>
+                                <router-link class="nav-link hover:active" to="hotels">Hotels</router-link>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link hover:active" href="#">About Us</a>
+                                <router-link class="nav-link hover:active" to="/about">About Us</router-link>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link hover:active" href="#">Contacts</a>
+                                <router-link class="nav-link hover:active" to="/contacts">Contacts</router-link>
                             </li>
                         </ul>
                         <a class="d-flex btn btn-outline-success" href="#">Sign in</a>

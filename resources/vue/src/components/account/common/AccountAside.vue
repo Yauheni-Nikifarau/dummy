@@ -9,8 +9,8 @@
             <nav-link v-for="item in menu" :key="item.link" :link="item.link" :title="item.title"></nav-link>
         </ul>
         <hr>
-        <a href="/" class="nav-link link-dark">To site</a>
-        <a href="/" class="nav-link link-dark">Logout</a>
+        <router-link to="/" class="nav-link link-dark">To site</router-link>
+        <router-link to="/" class="nav-link link-dark">Logout</router-link>
     </aside>
 </template>
 
@@ -19,10 +19,13 @@ import NavLink from "./NavLink";
 export default {
     setup () {
         const menu = [
-            {link: '/profile', title: 'Me'},
-            {link: '/profile/orders', title: 'My orders'},
-            {link: '/profile/messages', title: 'My messages'},
-        ]
+            {link: '/account', title: 'Me'},
+            {link: '/account/orders', title: 'My orders'},
+            {link: '/account/messages', title: 'My messages'},
+        ];
+        return {
+            menu
+        }
     },
     name: "account-aside",
     components: {
