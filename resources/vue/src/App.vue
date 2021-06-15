@@ -1,23 +1,26 @@
 <template>
     <div id="app">
-        <Header></Header>
-        <Main></Main>
-        <Footer></Footer>
+        <site v-if="site"></site>
+        <account v-else></account>
     </div>
 </template>
 
 <script>
-import Header from './components/site/common/Header.vue';
-import Main from './components/site/common/Main.vue';
-import Footer from './components/site/common/Footer.vue'
+import Site from "./components/site/common/Site";
+import Account from "./components/account/common/Account";
 
 export default {
-  name: 'App',
-  components: {
-    Header,
-    Main,
-    Footer
-  }
+    setup () {
+        const site = true;
+        return {
+            site
+        }
+    },
+    name: 'App',
+    components: {
+        Site,
+        Account
+    }
 }
 </script>
 

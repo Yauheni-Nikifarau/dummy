@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <main class="container">
         <h1>Hotels</h1>
 
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
@@ -7,7 +7,7 @@
         </div>
 
         <pagination :quantity="pages"></pagination>
-    </div>
+    </main>
 </template>
 
 <script>

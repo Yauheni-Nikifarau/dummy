@@ -33,7 +33,7 @@
 
 <script>
 export default {
-    name: "Header"
+    name: "site-header"
 }
 </script>
 
