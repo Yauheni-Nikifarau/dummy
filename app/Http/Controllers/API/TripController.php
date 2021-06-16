@@ -8,6 +8,7 @@ use App\Models\Discount;
 use App\Models\Tag;
 use App\Models\Trip;
 use Carbon\Carbon;
+use DB;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 
@@ -20,9 +21,9 @@ class TripController extends ApiController
      */
     public function index(Request $request)
     {
-        $trips = $this->getTripsWithFilter($request);
+        list($trips, $count) = $this->getTripsWithFilter($request);
 
-        return $this->responseSuccess(TripResource::collection($trips));
+        return $this->responseSuccess(TripResource::collection($trips), $count);
     }
 
     /**
@@ -154,10 +155,12 @@ class TripController extends ApiController
             $trips->limit($request->input('limit'));
         }
 
-        $trips = $trips->get();
+        $count = $trips->count();
 
+        $selectFields = ['*'];
+        $selectFields =  DB::raw('price as orig_price, price/2 as discount_price');
         if ($request->exists('min_price') && $request->exists('max_price')) {
-
+$selectFields =  DB::raw('price as orig_price, price/2 as discount_price');
             $min_price = $request->input('min_price');
             $max_price = $request->input('max_price');
 
@@ -194,6 +197,8 @@ class TripController extends ApiController
             });
         }
 
-        return $trips;
+        $trips = $trips->paginate(9, $selectFields);
+
+        return [$trips, $count];
     }
 }

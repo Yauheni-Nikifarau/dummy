@@ -1,15 +1,7 @@
 <template>
     <ul class="pagination mt-5">
-        <li class="page-item">
-            <a class="page-link" href="#" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-        <li v-for="n in quantity" :key="n" class="page-item"><a class="page-link" href="#">{{ n }}</a></li>
-        <li class="page-item">
-            <a class="page-link" href="#" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-            </a>
+        <li v-for="n in quantity" :key="n" class="page-item">
+            <button class="page-link" @click="changePageListener" :page="n">{{ n }}</button>
         </li>
     </ul>
 </template>
@@ -17,7 +9,13 @@
 <script>
 export default {
     name: "Pagination",
-    props: ['quantity']
+    props: ['quantity'],
+    methods: {
+        changePageListener (e) {
+            let page = e.target.attributes.page.value;
+            this.$emit('changePage', page);
+        }
+    }
 }
 </script>
 
