@@ -1,10 +1,11 @@
-export default function useGetTrips () {
-    const useGetTrips = async (url, variable) => { //TODO: вынести в тулы
-        let response = await fetch(url),
-            json = await response.json();
+export default function () {
+    const getTrips = async (url, variable) => {
+        //TODO: вынести в тулы
+        const response = await fetch(url);
+        const json = await response.json();
         variable.value = json.data;
-    }
+    };
     return {
-        useGetTrips
-    }
+        getTrips,
+    };
 }

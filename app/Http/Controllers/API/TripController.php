@@ -89,6 +89,7 @@ class TripController extends ApiController
     private function getTripsWithFilter(Request $request)
     {
         $trips = Trip::with(['hotel', 'discount', 'tags']);
+        $trips = $trips->leftJoin('discounts', 'trips.discount_id', '=', 'discounts.id');
         $trips = $trips->where('reservation', 0);
 
         if ($request->exists('people')) {
@@ -133,7 +134,7 @@ class TripController extends ApiController
             foreach ($trips_array as $trip) {
                 $arrayOfTripsId[] = $trip->id;
             }
-            $trips->whereIn('id', $arrayOfTripsId);
+            $trips->whereIn('trips.id', $arrayOfTripsId);
         }
 
         if ($request->exists('discount')) {
@@ -143,61 +144,31 @@ class TripController extends ApiController
             foreach ($trips_array as $trip) {
                 $arrayOfTripsId[] = $trip->id;
             }
-            $trips->whereIn('id', $arrayOfTripsId);
+            $trips->whereIn('trips.id', $arrayOfTripsId);
+        }
+
+        if ($request->exists('min_price')) {
+            $trips = $trips->whereRaw('trips.price * (100 - value) / 100 >= ?', [$request->input('min_price')]);
+        }
+
+        if ($request->exists('max_price')) {
+            $trips = $trips->whereRaw('trips.price * (100 - value) / 100 <= ?', [$request->input('max_price')]);
         }
 
         if ($request->exists('order')) {
             $direction = $request->input('direction', 'asc');
-            $trips->orderBy($request->input('order', $direction));
+            $trips->orderBy('trips.' . $request->input('order'), $direction);
         }
 
         if ($request->exists('limit')) {
             $trips->limit($request->input('limit'));
+            $trips = $trips->get();
+            return [$trips, 0];
         }
 
         $count = $trips->count();
 
-        $selectFields = ['*'];
-        $selectFields =  DB::raw('price as orig_price, price/2 as discount_price');
-        if ($request->exists('min_price') && $request->exists('max_price')) {
-$selectFields =  DB::raw('price as orig_price, price/2 as discount_price');
-            $min_price = $request->input('min_price');
-            $max_price = $request->input('max_price');
-
-            $trips = $trips->filter(function ($trip) use ($min_price, $max_price) {
-
-                $discount = $trip->discount->value ?? 0;
-                $price = $trip->price * (100 - $discount) / 100;
-                return $price >= $min_price && $price <= $max_price;
-
-            });
-
-        } elseif ($request->exists('min_price')) {
-
-            $min_price = $request->input('min_price');
-
-            $trips = $trips->filter(function ($trip) use ($min_price) {
-
-                $discount = $trip->discount->value ?? 0;
-                $price = $trip->price * (100 - $discount) / 100;
-                return $price >= $min_price;
-
-            });
-
-        } elseif ($request->exists('max_price')) {
-
-            $max_price = $request->input('max_price');
-
-            $trips = $trips->filter(function ($trip) use ($max_price) {
-
-                $discount = $trip->discount->value ?? 0;
-                $price = $trip->price * (100 - $discount) / 100;
-                return $price <= $max_price;
-
-            });
-        }
-
-        $trips = $trips->paginate(9, $selectFields);
+        $trips = $trips->paginate(9);
 
         return [$trips, $count];
     }
