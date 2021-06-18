@@ -23,6 +23,7 @@ class HotelResource extends JsonResource
             'stars'             => $this->stars,
             'country'           => $this->country,
             'city'              => $this->city,
+            'image'             => $this->image,
             'trips'             => TripResource::collection($this->whenLoaded('trips')),
             'orders'            => OrderResource::collection($this->whenLoaded('orders')),
             'weather'           => $this->weather(),

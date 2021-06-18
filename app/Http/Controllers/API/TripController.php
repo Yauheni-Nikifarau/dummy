@@ -4,9 +4,12 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TripResource;
+use App\Models\Discount;
+use App\Models\Hotel;
 use App\Models\Tag;
 use App\Models\Trip;
 use Carbon\Carbon;
+use DB;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 
@@ -19,9 +22,9 @@ class TripController extends ApiController
      */
     public function index(Request $request)
     {
-        $trips = $this->getTripsWithFilter($request);
+        list($trips, $count) = $this->getTripsWithFilter($request);
 
-        return $this->responseSuccess(TripResource::collection($trips));
+        return $this->responseSuccess(TripResource::collection($trips), $count);
     }
 
     /**
@@ -87,7 +90,9 @@ class TripController extends ApiController
     private function getTripsWithFilter(Request $request)
     {
         $trips = Trip::with(['hotel', 'discount', 'tags']);
+        $trips = $trips->leftJoin('discounts', 'trips.discount_id', '=', 'discounts.id');
         $trips = $trips->where('reservation', 0);
+        $trips = $trips->select('trips.*');
 
         if ($request->exists('people')) {
             $trips = $trips->where('quantity_of_people', $request->input('people'));
@@ -118,62 +123,60 @@ class TripController extends ApiController
         }
 
         if ($request->exists('hotel')) {
-            preg_match('/_[0-9]+$/', $request->input('hotel'), $matches);
-            $hotel_id = substr(end($matches), 1);
-            $trips = $trips->where('hotel_id', $hotel_id);
-        }
-
-        if ($request->exists('tag')) {
-            preg_match('/_[0-9]+$/', $request->input('tag'), $matches);
-            $tag_id = substr(end($matches),1);
-            $trips_array = Tag::find($tag_id)->trips ?? [];
+            $hotel_name = str_replace('_', ' ', $request->input('hotel'));
+            $hotel = Hotel::with(['trips'])->where('name', 'like', '%' . $hotel_name . '%')->first();
+            $trips_array = $hotel->trips ?? [];
             $arrayOfTripsId = [];
             foreach ($trips_array as $trip) {
                 $arrayOfTripsId[] = $trip->id;
             }
-            $trips->whereIn('id', $arrayOfTripsId);
+            $trips->whereIn('trips.id', $arrayOfTripsId);
         }
 
-        $trips = $trips->get();
-
-        if ($request->exists('min_price') && $request->exists('max_price')) {
-
-            $min_price = $request->input('min_price');
-            $max_price = $request->input('max_price');
-
-            $trips = $trips->filter(function ($trip) use ($min_price, $max_price) {
-
-                $discount = $trip->discount->value ?? 0;
-                $price = $trip->price * (100 - $discount) / 100;
-                return $price >= $min_price && $price <= $max_price;
-
-            });
-
-        } elseif ($request->exists('min_price')) {
-
-            $min_price = $request->input('min_price');
-
-            $trips = $trips->filter(function ($trip) use ($min_price) {
-
-                $discount = $trip->discount->value ?? 0;
-                $price = $trip->price * (100 - $discount) / 100;
-                return $price >= $min_price;
-
-            });
-
-        } elseif ($request->exists('max_price')) {
-
-            $max_price = $request->input('max_price');
-
-            $trips = $trips->filter(function ($trip) use ($max_price) {
-
-                $discount = $trip->discount->value ?? 0;
-                $price = $trip->price * (100 - $discount) / 100;
-                return $price <= $max_price;
-
-            });
+        if ($request->exists('tag')) {
+            $tag_name = str_replace('_', ' ', $request->input('tag'));
+            $tag = Tag::with(['trips'])->where('tag_name', $tag_name)->first();
+            $trips_array = $tag->trips ?? [];
+            $arrayOfTripsId = [];
+            foreach ($trips_array as $trip) {
+                $arrayOfTripsId[] = $trip->id;
+            }
+            $trips->whereIn('trips.id', $arrayOfTripsId);
         }
 
-        return $trips;
+        if ($request->exists('discount')) {
+            $discount = Discount::with(['trips'])->where('value', $request->input('discount'))->first();
+            $trips_array = $discount->trips ?? [];
+            $arrayOfTripsId = [];
+            foreach ($trips_array as $trip) {
+                $arrayOfTripsId[] = $trip->id;
+            }
+            $trips->whereIn('trips.id', $arrayOfTripsId);
+        }
+
+        if ($request->exists('min_price')) {
+            $trips = $trips->whereRaw('trips.price * (100 - value) / 100 >= ?', [$request->input('min_price')]);
+        }
+
+        if ($request->exists('max_price')) {
+            $trips = $trips->whereRaw('trips.price * (100 - value) / 100 <= ?', [$request->input('max_price')]);
+        }
+
+        if ($request->exists('order')) {
+            $direction = $request->input('direction', 'asc');
+            $trips->orderBy('trips.' . $request->input('order'), $direction);
+        }
+
+        if ($request->exists('limit')) {
+            $trips->limit($request->input('limit'));
+            $trips = $trips->get();
+            return [$trips, 0];
+        }
+
+        $count = $trips->count();
+
+        $trips = $trips->paginate(9);
+
+        return [$trips, $count];
     }
 }

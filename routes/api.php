@@ -5,6 +5,8 @@ use App\Http\Controllers\API\MessageController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\TripController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\DiscountsController;
+use App\Http\Controllers\API\TagsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,5 +30,7 @@ Route::resource('trips', TripController::class);
 Route::resource('hotels', HotelController::class);
 Route::resource('messages', MessageController::class, ['except' => ['update']])->middleware('auth');
 Route::resource('users', UserController::class);
+Route::get('tags', [TagsController::class, 'index']);
+Route::get('discounts', [DiscountsController::class, 'index']);
 
 
