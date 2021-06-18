@@ -204,16 +204,16 @@ export default {
                 queries.meal = filterOptions.meal;
             }
             if (filterOptions.minDateIn) {
-                queries.min_date_in = Date.parse(filterOptions.minDateIn);
+                queries.min_date_in = Date.parse(filterOptions.minDateIn) / 1000 | 0;
             }
             if (filterOptions.minDateOut) {
-                queries.min_date_out = Date.parse(filterOptions.minDateOut);
+                queries.min_date_out = Date.parse(filterOptions.minDateOut) / 1000 | 0;
             }
             if (filterOptions.maxDateIn) {
-                queries.max_date_in = Date.parse(filterOptions.maxDateIn);
+                queries.max_date_in = Date.parse(filterOptions.maxDateIn) / 1000 | 0;
             }
             if (filterOptions.maxDateOut) {
-                queries.max_date_out = Date.parse(filterOptions.maxDateOut);
+                queries.max_date_out = Date.parse(filterOptions.maxDateOut) / 1000 | 0;
             }
             let queryString = "";
             for (let key in queries) {

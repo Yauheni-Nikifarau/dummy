@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TripResource;
 use App\Models\Discount;
+use App\Models\Hotel;
 use App\Models\Tag;
 use App\Models\Trip;
 use Carbon\Carbon;
@@ -91,6 +92,7 @@ class TripController extends ApiController
         $trips = Trip::with(['hotel', 'discount', 'tags']);
         $trips = $trips->leftJoin('discounts', 'trips.discount_id', '=', 'discounts.id');
         $trips = $trips->where('reservation', 0);
+        $trips = $trips->select('trips.*');
 
         if ($request->exists('people')) {
             $trips = $trips->where('quantity_of_people', $request->input('people'));
@@ -121,9 +123,14 @@ class TripController extends ApiController
         }
 
         if ($request->exists('hotel')) {
-            preg_match('/_[0-9]+$/', $request->input('hotel'), $matches);
-            $hotel_id = substr(end($matches), 1);
-            $trips = $trips->where('hotel_id', $hotel_id);
+            $hotel_name = str_replace('_', ' ', $request->input('hotel'));
+            $hotel = Hotel::with(['trips'])->where('name', 'like', '%' . $hotel_name . '%')->first();
+            $trips_array = $hotel->trips ?? [];
+            $arrayOfTripsId = [];
+            foreach ($trips_array as $trip) {
+                $arrayOfTripsId[] = $trip->id;
+            }
+            $trips->whereIn('trips.id', $arrayOfTripsId);
         }
 
         if ($request->exists('tag')) {

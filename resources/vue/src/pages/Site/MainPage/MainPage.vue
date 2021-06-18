@@ -41,8 +41,6 @@ export default {
             variable.value = json.data;
         };
 
-        console.log(latestListUrl);
-
         getTrips(latestListUrl, latestList);
         getTrips(hotListUrl, hotList);
         getTrips(offListUrl, offList);

@@ -52,6 +52,7 @@ export default {
         const getFilteredTrips = (query) => {
             currentPage.value = 1;
             let url = tripsUrl + "?" + query;
+            console.log(url);
             tripsUrlWithParams.value = url;
             getDataForTripsList(url, currentPage);
         };
