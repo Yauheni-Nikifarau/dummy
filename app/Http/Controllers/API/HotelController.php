@@ -29,9 +29,11 @@ class HotelController extends ApiController
                 $query->with(['user', 'trip']);
                 }
 
-            ])->get();
+            ])->paginate(9);
 
-        return $this->responseSuccess(HotelResource::collection($resource));
+        $count = Hotel::count();
+
+        return $this->responseSuccess(HotelResource::collection($resource), $count);
     }
 
     /**

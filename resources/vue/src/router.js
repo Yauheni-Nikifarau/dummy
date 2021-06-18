@@ -9,6 +9,7 @@ import ContactsPage from "./pages/Site/ContactsPage";
 import MainPage from "./pages/Site/MainPage/MainPage";
 import TripsPage from "./pages/Site/TripsPage/TripsPage";
 import HotelsPage from "./pages/Site/HotelsPage/HotelsPage";
+import HotelPage from "./pages/Site/HotelPage/HotelPage";
 
 
 export const router = createRouter({
@@ -30,6 +31,7 @@ export const router = createRouter({
                 { path: "/", component: MainPage },
                 { path: "trips", component: TripsPage },
                 { path: "hotels", component: HotelsPage },
+                { path: "hotels/:name", component: HotelPage },
                 { path: "contacts", component: ContactsPage },
                 { path: "about", component: AboutPage },
             ],

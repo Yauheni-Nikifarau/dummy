@@ -16,11 +16,11 @@
                 :key="weather1DayForecast.date"
             >
                 <th scope="row">{{ weather1DayForecast.date }}</th>
-                <td>{{ weather1DayForecast.weather }}</td>
-                <td>{{ weather1DayForecast.morning }}</td>
-                <td>{{ weather1DayForecast.day }}</td>
-                <td>{{ weather1DayForecast.evening }}</td>
-                <td>{{ weather1DayForecast.night }}</td>
+                <td class="text-capitalize">{{ weather1DayForecast.weatherFull }}</td>
+                <td>{{ weather1DayForecast.morningTemperature }}</td>
+                <td>{{ weather1DayForecast.dayTemperature }}</td>
+                <td>{{ weather1DayForecast.eveningTemperature }}</td>
+                <td>{{ weather1DayForecast.nightTemperature }}</td>
             </tr>
         </tbody>
     </table>

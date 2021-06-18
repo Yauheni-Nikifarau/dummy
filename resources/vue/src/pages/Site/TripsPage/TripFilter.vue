@@ -1,6 +1,6 @@
 <template>
     <div class="card">
-        <form action="#" method="GET" class="m-5" @submit.prevent="filterEvent">
+        <form action="#" method="GET" class="m-5" @submit.prevent="filterEvent" @reset="resetFilterEvent">
             <div class="row d-flex justify-content-around">
                 <div class="col-5">
                     <h4>Hotel</h4>
@@ -129,6 +129,7 @@
 import InputSelect from "./InputSelect";
 import InputRadio from "./InputRadio";
 import { ref, reactive } from "vue";
+import { useRoute } from "vue-router";
 
 export default {
     name: "trip-filter",
@@ -154,6 +155,15 @@ export default {
             maxDateIn: "",
             maxDateOut: "",
         });
+
+        const route = useRoute();
+        if (route.query) {
+            for (let key in route.query) {
+                if (key in filterOptions) {
+                    filterOptions[key] = route.query[key];
+                }
+            }
+        }
 
         const getTagOptions = async () => {
             const response = await fetch(tagsUrl);
@@ -204,16 +214,20 @@ export default {
                 queries.meal = filterOptions.meal;
             }
             if (filterOptions.minDateIn) {
-                queries.min_date_in = Date.parse(filterOptions.minDateIn) / 1000 | 0;
+                queries.min_date_in =
+                    (Date.parse(filterOptions.minDateIn) / 1000) | 0;
             }
             if (filterOptions.minDateOut) {
-                queries.min_date_out = Date.parse(filterOptions.minDateOut) / 1000 | 0;
+                queries.min_date_out =
+                    (Date.parse(filterOptions.minDateOut) / 1000) | 0;
             }
             if (filterOptions.maxDateIn) {
-                queries.max_date_in = Date.parse(filterOptions.maxDateIn) / 1000 | 0;
+                queries.max_date_in =
+                    (Date.parse(filterOptions.maxDateIn) / 1000) | 0;
             }
             if (filterOptions.maxDateOut) {
-                queries.max_date_out = Date.parse(filterOptions.maxDateOut) / 1000 | 0;
+                queries.max_date_out =
+                    (Date.parse(filterOptions.maxDateOut) / 1000) | 0;
             }
             let queryString = "";
             for (let key in queries) {
@@ -225,6 +239,10 @@ export default {
             }
         };
 
+        const resetFilterEvent = () => {
+            emit("resetFilter");
+        }
+
         return {
             tagOptions,
             discountValues,
@@ -232,6 +250,7 @@ export default {
             mealOptions,
             filterOptions,
             filterEvent,
+            resetFilterEvent
         };
     },
 

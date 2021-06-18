@@ -31,7 +31,7 @@
                         <li class="nav-item">
                             <router-link
                                 class="nav-link hover:active"
-                                to="hotels"
+                                to="/hotels"
                                 >Hotels
                             </router-link>
                         </li>
