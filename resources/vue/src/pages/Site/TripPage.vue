@@ -4,14 +4,14 @@
 
         <p>
             Hotel:
-            <router-link :to="'/hotels/' + trip.hotel.id"
-                >{{ trip.hotel.name }}
+            <router-link :to="trip.hotelSlug"
+                >{{ trip.hotelName }}
             </router-link>
         </p>
 
         <p>Price: {{ trip.price }}$</p>
 
-        <p>Dates: {{ trip.date_in }} - {{ trip.date_out }}</p>
+        <p>Dates: {{ trip.dates }}</p>
 
         <div>
             <img :src="trip.image" alt="hotel" />
@@ -22,9 +22,41 @@
 </template>
 
 <script>
+import {useRoute} from "vue-router";
+import {reactive} from "vue";
+
 export default {
-    name: "trip-page",
-    props: ["trip"],
+    setup () {
+        const route = useRoute();
+        const tripId = route.params.slug.match(/\d+$/g)[0];
+        const tripUrl =
+            process.env.VUE_APP_API_ROOT_PATH + "/api/trips/" + tripId;
+        const trip = reactive({
+            name: '',
+            hotelSlug: '',
+            hotelName: '',
+            price: '',
+            dates: '',
+            image: ''
+        });
+        const getTripInfo = async () => {
+            const response = await fetch(tripUrl);
+            const json = await response.json();
+            const data = json.data;
+            trip.image = process.env.VUE_APP_API_ROOT_PATH + "/storage/" + data.image;
+            trip.name = data.name;
+            trip.hotelSlug = '/hotels/' + data.hotel.name.replace(/ /g, '_') + '_' + data.hotel.id;
+            trip.hotelName = data.hotel.name;
+            trip.price = data.price;
+            trip.dates = data.date_in + ' - ' + data.date_out;
+        };
+        getTripInfo();
+
+        return {
+            trip
+        }
+    },
+    name: "trip-page"
 };
 </script>
 

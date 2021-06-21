@@ -41,8 +41,7 @@ export default {
         }
 
         const getDataForTripsList = async (url, page) => {
-            console.log(url);
-            let urlObj = new URL(url);
+            const urlObj = new URL(url);
             if (urlObj.search) {
                 url += "&page=" + page;
             } else {
@@ -64,7 +63,7 @@ export default {
         const getFilteredTrips = (query) => {
             history.pushState(null, "", location.href.split("?")[0]);
             currentPage.value = 1;
-            let url = tripsUrl + "?" + query;
+            const url = tripsUrl + "?" + query;
             tripsUrlWithParams.value = url;
             getDataForTripsList(url, currentPage.value);
         };

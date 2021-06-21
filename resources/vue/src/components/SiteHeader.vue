@@ -50,7 +50,7 @@
                             </router-link>
                         </li>
                     </ul>
-                    <button class="d-flex btn btn-outline-success">
+                    <button class="d-flex btn btn-outline-success" @click.prevent="signInClickEvent">
                         Sign in
                     </button>
                 </div>
@@ -61,6 +61,14 @@
 
 <script>
 export default {
+    setup (props, { emit }) {
+        const signInClickEvent = () => {
+            emit("needLoginModal");
+        }
+        return {
+            signInClickEvent
+        }
+    },
     name: "site-header",
 };
 </script>

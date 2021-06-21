@@ -3,7 +3,7 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <img :src="apiRootForImages + trip.image" alt="hotel" />
-                <h3>{{ trip.name }}</h3>
+                <router-link :to="'/trips/' + trip.name.replace(/ /g, '_') + '_' + trip.id" class="fs-3 text-decoration-none">{{ trip.name }}</router-link>
                 <div class="d-flex justify-content-between align-items-center">
                     <p class="text-primary fw-bold">{{ trip.price }}$</p>
                     <small class="text-warning"

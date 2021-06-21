@@ -28,7 +28,7 @@ import { ref } from "vue";
 export default {
     setup() {
         const route = useRoute();
-        const hotelId = route.params.name.match(/\d+$/g)[0];
+        const hotelId = route.params.slug.match(/\d+$/g)[0];
         const hotelUrl =
             process.env.VUE_APP_API_ROOT_PATH + "/api/hotels/" + hotelId;
 
@@ -38,6 +38,7 @@ export default {
             const response = await fetch(hotelUrl);
             const json = await response.json();
             hotel.value = json.data;
+
             hotel.value.slug = hotel.value.name.replace(/ /g, '_');
             for (let item of hotel.value.weather) {
                 item.morningTemperature =

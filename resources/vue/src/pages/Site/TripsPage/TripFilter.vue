@@ -1,6 +1,12 @@
 <template>
     <div class="card">
-        <form action="#" method="GET" class="m-5" @submit.prevent="filterEvent" @reset="resetFilterEvent">
+        <form
+            action="#"
+            method="GET"
+            class="m-5"
+            @submit.prevent="filterEvent"
+            @reset="resetFilterEvent"
+        >
             <div class="row d-flex justify-content-around">
                 <div class="col-5">
                     <h4>Hotel</h4>
@@ -130,6 +136,7 @@ import InputSelect from "./InputSelect";
 import InputRadio from "./InputRadio";
 import { ref, reactive } from "vue";
 import { useRoute } from "vue-router";
+import { buildQuery } from "../../../composables/useFilterOptions";
 
 export default {
     name: "trip-filter",
@@ -191,57 +198,13 @@ export default {
         const mealOptions = ["OB", "HB", "FB", "BB", "AI"];
 
         const filterEvent = () => {
-            let queries = {};
-            if (filterOptions.hotel) {
-                queries.hotel = filterOptions.hotel;
-            }
-            if (filterOptions.tag) {
-                queries.tag = filterOptions.tag;
-            }
-            if (filterOptions.discount) {
-                queries.discount = filterOptions.discount;
-            }
-            if (filterOptions.minPrice) {
-                queries.min_price = filterOptions.minPrice;
-            }
-            if (filterOptions.maxPrice) {
-                queries.max_price = filterOptions.maxPrice;
-            }
-            if (filterOptions.people) {
-                queries.people = filterOptions.people;
-            }
-            if (filterOptions.meal) {
-                queries.meal = filterOptions.meal;
-            }
-            if (filterOptions.minDateIn) {
-                queries.min_date_in =
-                    (Date.parse(filterOptions.minDateIn) / 1000) | 0;
-            }
-            if (filterOptions.minDateOut) {
-                queries.min_date_out =
-                    (Date.parse(filterOptions.minDateOut) / 1000) | 0;
-            }
-            if (filterOptions.maxDateIn) {
-                queries.max_date_in =
-                    (Date.parse(filterOptions.maxDateIn) / 1000) | 0;
-            }
-            if (filterOptions.maxDateOut) {
-                queries.max_date_out =
-                    (Date.parse(filterOptions.maxDateOut) / 1000) | 0;
-            }
-            let queryString = "";
-            for (let key in queries) {
-                queryString += `&${key}=${queries[key]}`;
-            }
-            if (queryString) {
-                queryString = queryString.substring(1);
-                emit("changeFilter", queryString);
-            }
+            const queryString = buildQuery(filterOptions);
+            emit("changeFilter", queryString);
         };
 
         const resetFilterEvent = () => {
             emit("resetFilter");
-        }
+        };
 
         return {
             tagOptions,
@@ -250,7 +213,7 @@ export default {
             mealOptions,
             filterOptions,
             filterEvent,
-            resetFilterEvent
+            resetFilterEvent,
         };
     },
 
