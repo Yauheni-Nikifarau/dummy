@@ -1,19 +1,17 @@
 <template>
-    <div>
-        <site-header @needLoginModal="turnOnLoginModal"></site-header>
-        <router-view></router-view>
-        <site-footer :modal="modal"></site-footer>
-        <login-modal
-            v-if="modal == 'login'"
-            @closeModal="closeModal"
-            @needRegisterModal="turnOnRegisterModal"
-            @loginAttempt="loginAttempt"
-        ></login-modal>
-        <register-modal
-            v-if="modal == 'register'"
-            @closeModal="closeModal"
-        ></register-modal>
-    </div>
+    <site-header @needLoginModal="turnOnLoginModal"></site-header>
+    <router-view></router-view>
+    <site-footer></site-footer>
+    <login-modal
+        v-if="modal == 'login'"
+        @closeModal="closeModal"
+        @needRegisterModal="turnOnRegisterModal"
+        @loginAttempt="loginAttempt"
+    ></login-modal>
+    <register-modal
+        v-if="modal == 'register'"
+        @closeModal="closeModal"
+    ></register-modal>
 </template>
 
 <script>
@@ -41,10 +39,16 @@ export default {
             const loginUrl = process.env.VUE_APP_API_ROOT_PATH + '/login';
             const response = await fetch(loginUrl, {
                 method: 'POST',
-                email: credentials.email,
-                password: credentials.password
+                headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify({
+                    email: credentials.email,
+                    password: credentials.password
+                })
             });
-            console.log(response.statusCode);
+            const json = await response.json();
+            console.log(json);
         };
         return {
             modal,
