@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Resources\OrderResource;
+use App\Http\Traits\ResponseHandler;
 use App\Mail\OrderReport;
 use App\Models\Order;
 use App\Models\Trip;
@@ -18,6 +19,7 @@ use PhpOffice\PhpWord\Settings;
 
 class OrderController extends ApiController
 {
+    use ResponseHandler;
     /**
      * Display a listing of the resource.
      *
@@ -66,6 +68,7 @@ class OrderController extends ApiController
 
         $reservation_expires = Carbon::now()->addDays(3);
 
+
         try {
 
             DB::beginTransaction();
@@ -83,10 +86,10 @@ class OrderController extends ApiController
 
             DB::commit();
 
-            return response([
+            return $this->responseSuccess([
                 'success' => true,
                 'message' => 'Your order confirmed',
-            ], 201);
+            ], '',201);
 
         } catch (\Exception $e) {
 

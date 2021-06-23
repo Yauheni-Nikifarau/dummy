@@ -9,7 +9,7 @@
                     <small class="text-warning"
                         >{{ trip.date_in }} - {{ trip.date_out }}</small
                     >
-                    <button class="btn btn-outline-success">Buy it</button>
+                    <router-link :to="'/trips/' + trip.name.replace(/ /g, '_') + '_' + trip.id" class="btn btn-outline-success">Details</router-link>
                 </div>
             </div>
         </div>

@@ -9,7 +9,7 @@ class Trip extends Model
 {
     use HasFactory;
 
-    //protected $fillable = ['reservation'];
+    protected $fillable = ['reservation'];
 
 
     /**

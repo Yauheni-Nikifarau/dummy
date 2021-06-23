@@ -50,7 +50,10 @@
                             </router-link>
                         </li>
                     </ul>
-                    <button class="d-flex btn btn-outline-success" @click.prevent="signInClickEvent">
+                    <button class="d-flex btn btn-outline-warning" @click.prevent="logout" v-if="store.state.auth">
+                        Logout
+                    </button>
+                    <button class="d-flex btn btn-outline-success" @click.prevent="signInClickEvent" v-else>
                         Sign in
                     </button>
                 </div>
@@ -60,13 +63,27 @@
 </template>
 
 <script>
+import { useStore } from "vuex";
+
 export default {
     setup (props, { emit }) {
+        const store = useStore();
         const signInClickEvent = () => {
             emit("needLoginModal");
         }
+        const logout = () => {
+            if (localStorage.getItem('authHeader')) {
+                localStorage.removeItem('authHeader');
+            }
+            if (localStorage.getItem('authHeaderExpire')) {
+                localStorage.removeItem(('authHeaderExpire'));
+            }
+            store.commit('logout');
+        }
         return {
-            signInClickEvent
+            store,
+            signInClickEvent,
+            logout
         }
     },
     name: "site-header",

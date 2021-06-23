@@ -6,7 +6,6 @@
         v-if="modal == 'login'"
         @closeModal="closeModal"
         @needRegisterModal="turnOnRegisterModal"
-        @loginAttempt="loginAttempt"
     ></login-modal>
     <register-modal
         v-if="modal == 'register'"
@@ -33,26 +32,8 @@ export default {
         const closeModal = () => {
             modal.value = "none";
         };
-        const loginAttempt = async (credentials) => {
-            console.log(credentials.email);
-            console.log(credentials.password);
-            const loginUrl = process.env.VUE_APP_API_ROOT_PATH + '/login';
-            const response = await fetch(loginUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json;charset=utf-8'
-                },
-                body: JSON.stringify({
-                    email: credentials.email,
-                    password: credentials.password
-                })
-            });
-            const json = await response.json();
-            console.log(json);
-        };
         return {
             modal,
-            loginAttempt,
             turnOnLoginModal,
             closeModal,
             turnOnRegisterModal,
