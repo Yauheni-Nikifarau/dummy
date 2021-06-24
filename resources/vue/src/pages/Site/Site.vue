@@ -1,6 +1,6 @@
 <template>
     <site-header @needLoginModal="turnOnLoginModal"></site-header>
-    <router-view></router-view>
+    <router-view @needLoginModal="turnOnLoginModal"></router-view>
     <site-footer></site-footer>
     <login-modal
         v-if="modal == 'login'"

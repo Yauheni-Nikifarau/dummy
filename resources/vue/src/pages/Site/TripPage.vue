@@ -29,10 +29,10 @@
 
 <script>
 import { useRoute } from "vue-router";
-import {reactive, ref} from "vue";
+import { reactive, ref } from "vue";
 
 export default {
-    setup() {
+    setup(props, { emit }) {
         const route = useRoute();
         const tripId = route.params.slug.match(/\d+$/g)[0];
         const tripUrl =
@@ -65,19 +65,28 @@ export default {
         getTripInfo();
 
         const buyEvent = async () => {
-            const authHeader = localStorage.getItem('authHeader');
-            if (! authHeader) return;
-            const buyUrl = process.env.VUE_APP_API_ROOT_PATH + '/api/orders';
+            const authHeader = localStorage.getItem("authHeader");
+            const authHeaderExpire = localStorage.getItem("authHeaderExpire");
+            if (
+                !authHeader ||
+                !authHeaderExpire ||
+                authHeaderExpire < Math.trunc(Date.now() / 1000)
+            ) {
+                console.log(111);
+                emit('needLoginModal');
+                return;
+            }
+            const buyUrl = process.env.VUE_APP_API_ROOT_PATH + "/api/orders";
             const response = await fetch(buyUrl, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json;charset=utf-8',
-                    'Accept': 'application/json',
-                    'Authorization': authHeader
+                    "Content-Type": "application/json;charset=utf-8",
+                    Accept: "application/json",
+                    Authorization: authHeader,
                 },
                 body: JSON.stringify({
-                    trip_id: tripId
-                })
+                    trip_id: tripId,
+                }),
             });
             const json = await response.json();
             if (json.success === true) {

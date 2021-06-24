@@ -45,7 +45,7 @@ export default {
             if (urlObj.search) {
                 url += "&page=" + page;
             } else {
-                url += "?page=" + page;
+                url += "page=" + page;
             }
             const response = await fetch(url);
             const json = await response.json();
