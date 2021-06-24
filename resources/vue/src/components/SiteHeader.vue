@@ -49,6 +49,13 @@
                                 >Contacts
                             </router-link>
                         </li>
+                        <li class="nav-item" v-if="store.state.auth">
+                            <router-link
+                                class="nav-link hover:active"
+                                to="/account"
+                            >My account
+                            </router-link>
+                        </li>
                     </ul>
                     <button class="d-flex btn btn-outline-warning" @click.prevent="logout" v-if="store.state.auth">
                         Logout
