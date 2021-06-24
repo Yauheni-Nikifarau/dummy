@@ -3,28 +3,19 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Authorization</h5>
-                    <router-link
-                        to="/"
+                    <h5 class="modal-title"><slot name="title"></slot></h5>
+                    <button @click.prevent="closeModal"
                         class="btn-close"
                         data-bs-dismiss="modal"
                         aria-label="Close"
-                    ></router-link>
+                    ></button>
                 </div>
                 <div class="modal-body p-3">
-                    <slot></slot>
+                    <slot name="body"></slot>
                 </div>
 
                 <div class="modal-footer">
-                    <router-link
-                        to="/"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
-                        >Close</router-link
-                    >
-                    <router-link to="/account" class="btn btn-primary"
-                        >Login</router-link
-                    >
+                    <slot name="footer"></slot>
                 </div>
             </div>
         </div>
@@ -33,6 +24,14 @@
 
 <script>
 export default {
+    setup (props, {emit}) {
+        const closeModal = () => {
+            emit('closeModal');
+        }
+        return {
+            closeModal
+        }
+    },
     name: "modal",
 };
 </script>

@@ -5,8 +5,21 @@
 </template>
 
 <script>
+import { useStore } from "vuex";
 
 export default {
+    setup () {
+        const store = useStore();
+        const checkAuth = () => {
+            if (localStorage.getItem('authHeader') && localStorage.getItem('authHeaderExpire')) {
+                const now = Math.trunc(Date.now() / 1000);
+                if (localStorage.getItem('authHeaderExpire') > now) {
+                    store.commit('login');
+                }
+            }
+        };
+        checkAuth();
+    },
     name: 'App',
 }
 </script>

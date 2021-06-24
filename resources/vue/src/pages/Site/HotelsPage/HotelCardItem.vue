@@ -3,7 +3,7 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <img
-                    :src="hotel.image"
+                    :src="apiRootForImages + hotel.image"
                     alt="hotel"
                     style="width: 100%; height: 200px; object-fit: cover"
                 />
@@ -13,12 +13,12 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <router-link
                         class="btn btn-outline-success"
-                        :to="'/hotel/' + hotel.id"
+                        :to="'/hotels/' + hotel.name.replace(/ /g, '_') + '_' + hotel.id"
                         >More
                     </router-link>
                     <router-link
                         class="btn btn-outline-success"
-                        :to="'/trips?hotel_id=name_' + hotel.id"
+                        :to="'/trips?hotel=' + hotel.name.replace(/ /g, '_')"
                         >Trips
                     </router-link>
                 </div>
@@ -29,6 +29,11 @@
 
 <script>
 export default {
+  setup () {
+    return {
+      apiRootForImages: process.env.VUE_APP_API_ROOT_PATH + "/storage/"
+    }
+  },
     name: "hotel-card-item",
     props: ["hotel"],
 };

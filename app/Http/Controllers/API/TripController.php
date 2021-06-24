@@ -124,12 +124,15 @@ class TripController extends ApiController
 
         if ($request->exists('hotel')) {
             $hotel_name = str_replace('_', ' ', $request->input('hotel'));
-            $hotel = Hotel::with(['trips'])->where('name', 'like', '%' . $hotel_name . '%')->first();
-            $trips_array = $hotel->trips ?? [];
+            $hotels = Hotel::with(['trips'])->where('name', 'like', '%' . $hotel_name . '%')->get();
             $arrayOfTripsId = [];
-            foreach ($trips_array as $trip) {
-                $arrayOfTripsId[] = $trip->id;
+            foreach ($hotels as $hotel) {
+                $trips_array = $hotel->trips ?? [];
+                foreach ($trips_array as $trip) {
+                    $arrayOfTripsId[] = $trip->id;
+                }
             }
+            $arrayOfTripsId = array_unique($arrayOfTripsId);
             $trips->whereIn('trips.id', $arrayOfTripsId);
         }
 

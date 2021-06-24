@@ -3,17 +3,17 @@
         <h1>{{ hotel.name }}</h1>
 
         <div>
-            <img :src="hotel.image" alt="hotel" />
+            <img :src="apiRootForImages + hotel.image" alt="hotel" class="mb-3"/>
         </div>
 
         <p>Description: {{ hotel.description }}</p>
 
         <h3>Weather Forecast on the nearest 7 days at this hotel's area</h3>
 
-        <weather-table :weather="weatherForecast"></weather-table>
+        <weather-table :weather7-days-forecast="hotel.weather"></weather-table>
 
         <router-link
-            :to="'/trips?hotel=name_' + hotel.id"
+            :to="'/trips?hotel=' + hotel.slug"
             class="btn btn-success"
             >Hotel's trips
         </router-link>
@@ -22,82 +22,55 @@
 
 <script>
 import WeatherTable from "./WeatherTable";
+import { useRoute } from "vue-router";
+import { ref } from "vue";
 
 export default {
     setup() {
-        const weatherForecast = [
-            {
-                date: "1.06",
-                weather: "Clear sky",
-                morning: "+19",
-                day: "+22",
-                evening: "+20",
-                night: "+15",
-            },
-            {
-                date: "2.06",
-                weather: "Clear sky",
-                morning: "+19",
-                day: "+22",
-                evening: "+20",
-                night: "+15",
-            },
-            {
-                date: "3.06",
-                weather: "Clear sky",
-                morning: "+19",
-                day: "+22",
-                evening: "+20",
-                night: "+15",
-            },
-            {
-                date: "4.06",
-                weather: "Clear sky",
-                morning: "+19",
-                day: "+22",
-                evening: "+20",
-                night: "+15",
-            },
-            {
-                date: "5.06",
-                weather: "Clear sky",
-                morning: "+19",
-                day: "+22",
-                evening: "+20",
-                night: "+15",
-            },
-            {
-                date: "6.06",
-                weather: "Clear sky",
-                morning: "+19",
-                day: "+22",
-                evening: "+20",
-                night: "+15",
-            },
-            {
-                date: "7.06",
-                weather: "Clear sky",
-                morning: "+19",
-                day: "+22",
-                evening: "+20",
-                night: "+15",
-            },
-            {
-                date: "8.06",
-                weather: "Clear sky",
-                morning: "+19",
-                day: "+22",
-                evening: "+20",
-                night: "+15",
-            },
-        ];
+        const route = useRoute();
+        const hotelId = route.params.slug.match(/\d+$/g)[0];
+        const hotelUrl =
+            process.env.VUE_APP_API_ROOT_PATH + "/api/hotels/" + hotelId;
+
+        const hotel = ref({});
+
+        const getHotelInfo = async () => {
+            const response = await fetch(hotelUrl);
+            const json = await response.json();
+            hotel.value = json.data;
+
+            hotel.value.slug = hotel.value.name.replace(/ /g, '_');
+            for (let item of hotel.value.weather) {
+                item.morningTemperature =
+                    item.morningTemperature < 0
+                        ? Math.ceil(item.morningTemperature)
+                        : "+" + Math.ceil(item.morningTemperature);
+                item.dayTemperature =
+                    item.dayTemperature < 0
+                        ? Math.ceil(item.dayTemperature)
+                        : "+" + Math.ceil(item.dayTemperature);
+                item.eveningTemperature =
+                    item.eveningTemperature < 0
+                        ? Math.ceil(item.eveningTemperature)
+                        : "+" + Math.ceil(item.eveningTemperature);
+                item.nightTemperature =
+                    item.nightTemperature < 0
+                        ? Math.ceil(item.nightTemperature)
+                        : "+" + Math.ceil(item.nightTemperature);
+            }
+        };
+
+        getHotelInfo();
+        const apiRootForImages =
+            process.env.VUE_APP_API_ROOT_PATH + "/storage/";
+
 
         return {
-            weatherForecast,
+            hotel,
+            apiRootForImages,
         };
     },
     name: "HotelPage",
-    props: ["hotel"],
     components: {
         WeatherTable,
     },

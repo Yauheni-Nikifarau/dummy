@@ -4,7 +4,7 @@
 
 <script>
 export default {
-    name: "shadow",
+    name: "bg-shadow",
 };
 </script>
 

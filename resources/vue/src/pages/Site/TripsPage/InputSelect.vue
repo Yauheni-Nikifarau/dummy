@@ -10,6 +10,7 @@
             v-for="option in options"
             :key="option.id"
             :value="option.value"
+            :selected="option.value == selectedTag"
         >
             {{ option.name }}
         </option>
@@ -17,7 +18,15 @@
 </template>
 
 <script>
+import {ref} from "vue";
+
 export default {
+    setup (props) {
+        const selectedTag = ref(props.modelValue);
+        return {
+            selectedTag
+        }
+    },
     name: "input-select",
     props: ["modelValue", "title", "options"],
     emits: ["update:modelValue"],

@@ -14,22 +14,11 @@
             </p>
         </div>
     </footer>
-
-    <login-modal v-if="modal == 'login'"></login-modal>
-    <register-modal v-if="modal == 'register'"></register-modal>
 </template>
 
 <script>
-import LoginModal from "./LoginModal";
-import RegisterModal from "./RegisterModal";
-
 export default {
     name: "site-footer",
-    props: ["modal"],
-    components: {
-        LoginModal,
-        RegisterModal,
-    },
 };
 </script>
 
