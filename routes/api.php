@@ -21,11 +21,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth')->prefix('orders')->group(function () {
-    Route::resource('/', OrderController::class);
-    Route::get('/{id}/report', [OrderController::class, 'report']);
-});
 
+Route::resource('orders', OrderController::class)->middleware('auth');
+Route::get('orders/{order}/report', [OrderController::class, 'report'])->middleware('auth');
 Route::resource('trips', TripController::class);
 Route::resource('hotels', HotelController::class);
 Route::resource('messages', MessageController::class, ['except' => ['update']])->middleware('auth');

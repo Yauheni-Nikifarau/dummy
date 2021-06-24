@@ -24,10 +24,11 @@
 
 <script>
 import OrderListItem from "./OrderListItem";
+import {ref} from "vue";
 
 export default {
     setup() {
-        const orders = [
+        const orders = ref([
             {
                 id: 192,
                 created_at: "12.12.2021 13:14:15",
@@ -76,7 +77,19 @@ export default {
                     },
                 },
             },
-        ];
+        ]);
+        const getOrders = async () => {
+            const authHeader = localStorage.getItem("authHeader");
+            const ordersUrl = process.env.VUE_APP_API_ROOT_PATH + '/api/orders';
+            const response = await fetch(ordersUrl, {
+                headers: {
+                    Authorization: authHeader,
+                },
+            });
+            const json = await response.json();
+            orders.value = json.data;
+        }
+        getOrders()
         return {
             orders,
         };

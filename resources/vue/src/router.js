@@ -11,6 +11,7 @@ import TripsPage from "./pages/Site/TripsPage/TripsPage";
 import HotelsPage from "./pages/Site/HotelsPage/HotelsPage";
 import HotelPage from "./pages/Site/HotelPage/HotelPage";
 import TripPage from "./pages/Site/TripPage";
+import OrderPage from "./pages/Account/OrderPage";
 
 
 export const router = createRouter({
@@ -22,6 +23,7 @@ export const router = createRouter({
             children: [
                 { path: "", component: MePage },
                 { path: "orders", component: OrdersPage },
+                { path: "orders/:id", component: OrderPage },
                 { path: "messages", component: MessagesPage },
             ],
         },
@@ -30,6 +32,7 @@ export const router = createRouter({
             component: Site,
             children: [
                 { path: "/", component: MainPage },
+                { path: "login", component: MainPage },
                 { path: "trips", component: TripsPage },
                 { path: "trips/:slug", component: TripPage },
                 { path: "hotels", component: HotelsPage },

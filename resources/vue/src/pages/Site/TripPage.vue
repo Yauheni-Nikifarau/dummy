@@ -72,7 +72,6 @@ export default {
                 !authHeaderExpire ||
                 authHeaderExpire < Math.trunc(Date.now() / 1000)
             ) {
-                console.log(111);
                 emit('needLoginModal');
                 return;
             }

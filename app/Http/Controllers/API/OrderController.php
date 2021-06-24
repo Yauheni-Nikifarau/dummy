@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Resources\OrderResource;
+use App\Http\Resources\OrdersResource;
 use App\Http\Traits\ResponseHandler;
 use App\Mail\OrderReport;
 use App\Models\Order;
@@ -27,17 +28,16 @@ class OrderController extends ApiController
      */
     public function index()
     {
+        $user_id = auth()->id();
         $resource = Order::with([
 
             'trip' => function (BelongsTo $query) {
                 $query->with(['hotel']);
-                },
+                }
 
-            'user'
+            ])->where('user_id', $user_id)->get();
 
-            ])->get();
-
-        return $this->responseSuccess(OrderResource::collection($resource));
+        return $this->responseSuccess(OrdersResource::collection($resource));
     }
 
     /**
@@ -114,8 +114,6 @@ class OrderController extends ApiController
                 $query->with(['hotel']);
                 },
 
-            'user'
-
             ])->find($id);
 
         if ($resource) {
@@ -190,11 +188,13 @@ class OrderController extends ApiController
             $phpWord->save($fileFullPath, 'PDF');
         }
 
+        preg_match('/ordersReports.*/',$fileFullPath, $relativePath);
+
         if ($sendViaEmail == 'true') {
             Mail::to($user)->send(new OrderReport($fileFullPath, $extension));
             return $this->responseSuccess([], 'Check your email box');
         } else {
-            return Response::download($fileFullPath);
+            return $this->responseSuccess($relativePath);
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderResource extends JsonResource
@@ -17,12 +18,10 @@ class OrderResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'trip' => $this->trip->name,
-            'user' => $this->user->name . ' ' . $this->user->surname,
-            'hotel_name' =>$this->trip->hotel->name,
+            'reservation_expires' => Carbon::parse($this->reservation_expires)->format('h:i d-m-Y'),
+            'price' => $this->price,
             'paid' => $this->paid,
-            'reservation_expires' => $this->reservation_expires,
-            'price' => $this->price
+            'image' => $this->trip->image
         ];
     }
 }
