@@ -10,7 +10,7 @@
         </p>
         <p>
             If you have any problem, or questions,
-            <button class="btn btn-success">contact us</button>
+            <router-link :to="'/account/conversations/' + order.id" class="btn btn-success">contact us</router-link>
         </p>
         <p>
             Download report:

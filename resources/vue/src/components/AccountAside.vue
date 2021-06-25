@@ -43,7 +43,7 @@ export default {
         const menu = [
             { link: "/account", title: "Me" },
             { link: "/account/orders", title: "My orders" },
-            { link: "/account/messages", title: "My messages" },
+            { link: "/account/conversations", title: "My messages" },
         ];
         const router = useRouter();
         const store = useStore();

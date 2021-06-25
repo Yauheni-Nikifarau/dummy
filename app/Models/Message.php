@@ -33,4 +33,14 @@ class Message extends Model
     {
         return $this->belongsTo(User::class, 'to_id');
     }
+
+    /**
+     * Returns information about order it's linked
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function subject()
+    {
+        return $this->hasOne(Order::class, 'id');
+    }
 }

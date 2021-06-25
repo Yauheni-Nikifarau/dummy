@@ -8,6 +8,7 @@ use App\Http\Traits\ResponseHandler;
 use App\Mail\OrderReport;
 use App\Models\Order;
 use App\Models\Trip;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
@@ -80,6 +81,7 @@ class OrderController extends ApiController
             $order->paid                = false;
             $order->reservation_expires = $reservation_expires;
             $order->price               = $trip->price * (100 - ($trip->discount->value ?? 0)) / 100;
+            $order->admin_id            = User::where('role', 'admin')->where('id', '<>', $user_id)->inRandomOrder()->first()->id;
 
             $trip->update(['reservation' => true]);
             $order->save();

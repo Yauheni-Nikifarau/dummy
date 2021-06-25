@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MessageResource extends JsonResource
@@ -16,10 +17,8 @@ class MessageResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
-            'from' => new UserResource($this->from),
-            'to' => new UserResource($this->to),
-            'subject' => $this->subject,
+            'user' => $this->from->id == auth()->id() ? 'you' : 'admin',
+            'date' => Carbon::parse($this->created_at)->format('d-m h:i'),
             'text' => $this->text
         ];
     }

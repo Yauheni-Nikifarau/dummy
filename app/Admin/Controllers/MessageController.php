@@ -124,12 +124,12 @@ class MessageController extends AdminController
             return $this->from->name . ' ' . $this->from->surname;
         });
 
-        $grid->column('subject', __('Subject'))->modal('Message', function ($model) {
+        $grid->column('subject', 'Subject')->modal('Message', function ($model) {
             $props = [
                 'way' => 'From',
                 'opponent' => $this->from->name . ' ' . $this->from->surname,
                 'opponent_id' => $this->from->id,
-                'subject' => $this->subject,
+                'subject' => $this->subject->id,
                 'text' => $this->text,
             ];
             return view('admin.message', $props);
@@ -166,11 +166,13 @@ class MessageController extends AdminController
             return $this->to->name . ' ' . $this->to->surname;
         });
 
-        $grid->column('subject', __('Subject'))->expand(function ($model) {
+        $grid->column('subject', __('Subject'))->display(function () {
+            return $this->subject;
+        })->modal('Subject', function ($model) {
             $props = [
                 'way' => 'To',
                 'opponent' => $this->to->name . ' ' . $this->to->surname,
-                'subject' => $this->subject,
+                'subject' => $this->subject->id,
                 'text' => $this->text,
             ];
             return view('admin.message', $props);

@@ -17,11 +17,13 @@ class Orders extends Migration
             $table->id();
             $table->foreignId('trip_id')->unsigned()->nullable();
             $table->foreignId('user_id')->unsigned();
+            $table->foreignId('admin_id')->unsigned();
             $table->boolean('paid')->default(false);
             $table->timestamp('reservation_expires');
             $table->decimal('price', 10, 2);
             $table->foreign('trip_id')->references('id')->on('trips')->onDelete('set null');
             $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('admin_id')->references('id')->on('users');
             $table->timestamps();
         });
     }

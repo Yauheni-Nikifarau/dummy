@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Requests\IndexMessageRequest;
+use App\Http\Resources\MessageListResource;
 use App\Http\Resources\MessageResource;
 use App\Mail\DialogueStart;
 use App\Models\Message;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -19,25 +21,13 @@ class MessageController extends ApiController
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|AnonymousResourceCollection|\Illuminate\Http\Response
      */
-    public function index(IndexMessageRequest $request)
+    public function index()
     {
         $userId = auth()->id();
 
-        $way = $request->input('way', 'inbox');
+        $subjects = Message::select(['subject'])->where('from_id', $userId)->orWhere('to_id', $userId)->distinct()->get();
 
-        switch ($way) {
-            case 'inbox':
-                $messages = $this->getAllInboxMessages($userId);
-                break;
-            case 'sent':
-                $messages = $this->getAllSentMessages($userId);
-                break;
-            case 'dialogue':
-                $messages = $this->getDialogWith($userId, $request->input('to'));
-                break;
-        }
-
-        return $this->responseSuccess($messages);
+        return $this->responseSuccess(MessageListResource::collection($subjects));
     }
 
     /**
@@ -50,8 +40,7 @@ class MessageController extends ApiController
     {
 
         $validator = Validator::make($request->all(), [
-            'to_id' => 'required|integer|exists:users,id',
-            'subject' => 'string|max:255|nullable',
+            'subject' => 'required|int',
             'text' => 'required|string|max:2000',
         ]);
 
@@ -59,29 +48,25 @@ class MessageController extends ApiController
             return $this->responseError('Wrong parameters', 400, $validator->errors());
         }
 
-        $userId = $request->input('from_id', auth()->id());
-
-        $toUser = User::find($request->input('to_id'));
-
         $message = new Message();
 
-        $message->from_id = $userId;
-        $message->to_id = $toUser->id;
-        $message->text = $request->input('text');
+        $message->from_id = auth()->id();
         $message->subject = $request->input('subject');
+        $message->to_id = Order::find($message->subject)->admin->id;
+        $message->text = $request->input('text');
 
         $savingResult = $message->save();
 
 
         if ($savingResult) {
 
-            if ($this->isFirstMessage($userId, $toUser->id)) {
-                $this->sendEmailToRecepientAboutDialogueStart($toUser->id, $userId);
-            }
+//            if ($this->isFirstMessage($userId, $toUser->id)) {
+//                $this->sendEmailToRecepientAboutDialogueStart($toUser->id, $userId);
+//            }
 
             return response([
                 'success' => true,
-                'message' => "Your message to {$toUser->name} {$toUser->surname} has been sent",
+                'message' => "Your message has been sent",
             ], 201);
         } else {
             return $this->responseError('Sorry, but something were wrong. Try again.', 500);
@@ -96,13 +81,9 @@ class MessageController extends ApiController
      */
     public function show($id)
     {
-        $res = Message::with(['from', 'to'])->find($id);
+        $res = Message::with(['from', 'to'])->where('subject', $id)->get();
 
-        if ($res) {
-            return $this->responseSuccess(new MessageResource($res));
-        } else {
-            return $this->responseError('There is no message with such id', 404);
-        }
+        return $this->responseSuccess(MessageResource::collection($res));
     }
 
 

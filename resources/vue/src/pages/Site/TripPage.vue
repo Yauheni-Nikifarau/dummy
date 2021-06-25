@@ -88,6 +88,7 @@ export default {
                 }),
             });
             const json = await response.json();
+            console.log(json);
             if (json.success === true) {
                 confirmOrder.value = true;
             }

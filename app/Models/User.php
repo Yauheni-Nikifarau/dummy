@@ -97,6 +97,14 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Order::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function administratedOrders()
+    {
+        return $this->hasMany(Order::class, 'admin_id');
+    }
+
     // Rest omitted for brevity
 
     /**
