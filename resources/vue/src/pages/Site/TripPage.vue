@@ -1,5 +1,11 @@
 <template>
-    <main class="container">
+    <div class=" container alert alert-warning mt-3 h-25 w-100 text-center" v-if="notFound">
+        There is no such trip in our memory.
+    </div>
+    <div class=" container alert alert-danger mt-3 h-25 w-100 text-center" v-else-if="error">
+        Something went wrong. Try again.
+    </div>
+    <main class="container" v-else>
         <h1>{{ trip.name }}</h1>
 
         <p>
@@ -34,6 +40,8 @@ import { reactive, ref } from "vue";
 export default {
     setup(props, { emit }) {
         const route = useRoute();
+        const notFound = ref(false);
+        const error = ref(false);
         const tripId = route.params.slug.match(/\d+$/g)[0];
         const tripUrl =
             process.env.VUE_APP_API_ROOT_PATH + "/api/trips/" + tripId;
@@ -47,7 +55,14 @@ export default {
             image: "",
         });
         const getTripInfo = async () => {
-            const response = await fetch(tripUrl);
+            const response = await fetch(tripUrl).catch(() => {error.value = true});
+            if (!response) {
+                return;
+            }
+            if (response.status == 404) {
+                notFound.value = true;
+                return;
+            }
             const json = await response.json();
             const data = json.data;
             trip.image =
@@ -98,6 +113,8 @@ export default {
             confirmOrder,
             buyEvent,
             trip,
+            notFound,
+            error
         };
     },
     name: "trip-page",

@@ -17,7 +17,7 @@
 <script>
 import TripsGroup from "./TripsGroup.vue";
 import Promo from "./Promo.vue";
-import { ref } from "vue";
+import { reactive } from "vue";
 
 export default {
     setup() {
@@ -31,14 +31,32 @@ export default {
                 tripsUrl +
                 "?discount=35&order=created_at&direction=desc&limit=3";
 
-        const latestList = ref([]),
-            hotList = ref([]),
-            offList = ref([]);
+        const latestList = reactive({
+                list: [],
+                error: false,
+                empty: false,
+            }),
+            hotList = reactive({
+                list: [],
+                error: false,
+                empty: false,
+            }),
+            offList = reactive({
+                list: [],
+                error: false,
+                empty: false,
+            });
 
         const getTrips = async (url, variable) => {
-            const response = await fetch(url);
+            const response = await fetch(url).catch(() => {variable.error = true});
+            if(!response || response.status != 200) {
+                variable.error = true;
+            }
             const json = await response.json();
-            variable.value = json.data;
+            variable.list = json.data;
+            if(variable.list.length == 0) {
+                variable.empty = true;
+            }
         };
 
         getTrips(latestListUrl, latestList);

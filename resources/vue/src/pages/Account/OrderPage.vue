@@ -1,5 +1,8 @@
 <template>
-    <main class="p-5">
+    <div class="alert alert-warning mt-3 h-25 w-100 text-center" v-if="notFound">
+        You don't have an order with such id.
+    </div>
+    <main class="p-5" v-else>
         <img :src="order.image" alt="hotel" />
         <h2>Order #{{ order.id }}</h2>
         <p>Price: {{ order.price }}$</p>
@@ -27,7 +30,7 @@
         <div class="alert alert-success mt-3" v-if="mailSent">
             Check Your Email Box!
         </div>
-        <div class="alert alert-danger mt-3" v-if="mailError">
+        <div class="alert alert-danger mt-3" v-if="error">
             Sorry, but something went wrong.
         </div>
     </main>
@@ -43,7 +46,8 @@ export default {
         const authHeader = localStorage.getItem("authHeader");
         const orderId = route.params.id;
         const mailSent = ref(false);
-        const mailError = ref(false);
+        const error = ref(false);
+        const notFound = ref(false);
         const order = reactive({
             id: "",
             price: 0,
@@ -59,6 +63,10 @@ export default {
                     Authorization: authHeader,
                 },
             });
+            if (response.status == 404) {
+                notFound.value = true;
+                return;
+            }
             const json = await response.json();
             const data = json.data;
             order.id = data.id;
@@ -85,13 +93,13 @@ export default {
                 },
             });
             if (response.status == 500) {
-                mailError.value = true;
+                error.value = true;
                 mailSent.value = false;
             }
             const data = await response.json();
             if (mail) {
                 if (data.success) {
-                    mailError.value = false;
+                    error.value = false;
                     mailSent.value = true;
                 }
             } else {
@@ -125,7 +133,8 @@ export default {
             docxReport,
             order,
             mailSent,
-            mailError
+            error,
+            notFound
         };
     },
     name: "order-page",

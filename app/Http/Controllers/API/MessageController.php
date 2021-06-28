@@ -27,6 +27,16 @@ class MessageController extends ApiController
 
         $subjects = Message::select(['subject'])->where('from_id', $userId)->orWhere('to_id', $userId)->distinct()->get();
 
+        $subjects = $subjects->filter(function ($subject) use ($userId) {
+
+            $order = Order::find($subject->subject);
+            if (!$order) {
+                return false;
+            }
+            return $order->user->id == $userId;
+
+        });
+
         return $this->responseSuccess(MessageListResource::collection($subjects));
     }
 
@@ -81,6 +91,10 @@ class MessageController extends ApiController
      */
     public function show($id)
     {
+        $order = Order::find($id);
+        if (!$order || $order->user->id != auth()->id()) {
+            return $this->responseError("You didn't have an order with such number", 400);
+        }
         $res = Message::with(['from', 'to'])->where('subject', $id)->get();
 
         return $this->responseSuccess(MessageResource::collection($res));
