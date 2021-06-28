@@ -1,7 +1,7 @@
 <template>
     <div class="container d-flex">
         <account-aside></account-aside>
-        <router-view></router-view>
+        <router-view @needAuthorization="needAuthorization"></router-view>
     </div>
 </template>
 
@@ -13,8 +13,14 @@ import { useRouter } from "vue-router";
 export default {
     setup() {
         const router = useRouter();
-        if (!checkAuth()) {
+        const needAuthorization = () => {
             router.push({ path: '/login' });
+        }
+        if (!checkAuth()) {
+            needAuthorization();
+        }
+        return {
+            needAuthorization
         }
     },
     name: "account",

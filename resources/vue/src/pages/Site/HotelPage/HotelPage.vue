@@ -1,5 +1,11 @@
 <template>
-    <main class="container">
+    <div class=" container alert alert-warning mt-3 h-25 w-100 text-center" v-if="notFound">
+        There is no such hotel in our memory.
+    </div>
+    <div class=" container alert alert-danger mt-3 h-25 w-100 text-center" v-else-if="error">
+        Something went wrong. Try again.
+    </div>
+    <main class="container" v-else>
         <h1>{{ hotel.name }}</h1>
 
         <div>
@@ -28,6 +34,8 @@ import { ref } from "vue";
 export default {
     setup() {
         const route = useRoute();
+        const notFound = ref(false);
+        const error = ref(false);
         const hotelId = route.params.slug.match(/\d+$/g)[0];
         const hotelUrl =
             process.env.VUE_APP_API_ROOT_PATH + "/api/hotels/" + hotelId;
@@ -35,7 +43,14 @@ export default {
         const hotel = ref({});
 
         const getHotelInfo = async () => {
-            const response = await fetch(hotelUrl);
+            const response = await fetch(hotelUrl).catch(() => {error.value = true});
+            if (!response) {
+                return;
+            }
+            if (response.status == 404) {
+                notFound.value = true;
+                return;
+            }
             const json = await response.json();
             hotel.value = json.data;
 
@@ -68,6 +83,7 @@ export default {
         return {
             hotel,
             apiRootForImages,
+            notFound
         };
     },
     name: "HotelPage",

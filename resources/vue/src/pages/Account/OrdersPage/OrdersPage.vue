@@ -19,6 +19,12 @@
                 ></order-list-item>
             </tbody>
         </table>
+        <div class="alert-warning" v-if="orders.length == 0 && !errorSwitch">
+            You have not any orders
+        </div>
+        <div class="alert-danger" v-if="errorSwitch">
+            Error. Try again.
+        </div>
     </main>
 </template>
 
@@ -27,22 +33,30 @@ import OrderListItem from "./OrderListItem";
 import {ref} from "vue";
 
 export default {
-    setup() {
+    setup(props, { emit }) {
         const orders = ref([]);
+        const errorSwitch = ref(false);
         const getOrders = async () => {
             const authHeader = localStorage.getItem("authHeader");
+            if (!authHeader) {
+                emit('needAuthorization');
+            }
             const ordersUrl = process.env.VUE_APP_API_ROOT_PATH + '/api/orders';
             const response = await fetch(ordersUrl, {
                 headers: {
                     Authorization: authHeader,
                 },
-            });
+            }).catch(() => {errorSwitch.value = true});
+            if (response.status == 403) {
+                emit("needAuthorization");
+            }
             const json = await response.json();
             orders.value = json.data;
         }
         getOrders()
         return {
             orders,
+            errorSwitch
         };
     },
     name: "orders-page",

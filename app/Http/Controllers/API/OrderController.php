@@ -110,7 +110,7 @@ class OrderController extends ApiController
      */
     public function show($id)
     {
-        $resource = Order::with([
+        $order = Order::with([
 
             'trip' => function (BelongsTo $query) {
                 $query->with(['hotel']);
@@ -118,8 +118,8 @@ class OrderController extends ApiController
 
             ])->find($id);
 
-        if ($resource) {
-            return $this->responseSuccess(new OrderResource($resource));
+        if ($order && $order->user->id == auth()->id()) {
+            return $this->responseSuccess(new OrderResource($order));
         } else {
             return $this->responseError('There is no order with such id', 404);
         }
