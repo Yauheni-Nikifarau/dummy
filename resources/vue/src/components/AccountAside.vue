@@ -29,7 +29,7 @@
         </ul>
         <hr />
         <router-link to="/" class="nav-link link-dark">To site</router-link>
-        <router-link to="/" class="nav-link link-dark" @click.="logoutEvent">Logout</router-link>
+        <router-link to="/" class="nav-link link-dark" @click="logoutEvent">Logout</router-link>
     </aside>
 </template>
 

@@ -74,12 +74,13 @@ export default {
                     email: email.value,
                     password: password.value
                 })
-            });
+            }).catch(() => {loginAnyErrorSwitch.value = true});
             const json = await response.json();
             if (json.access_token && json.token_type && json.expires_in) {
                 localStorage.setItem('authHeader', `${json.token_type} ${json.access_token}`);
                 localStorage.setItem('authHeaderExpire', Math.trunc(Date.now() / 1000) + json.expires_in);
                 loginErrorSwitch.value = false;
+                loginAnyErrorSwitch.value = false;
                 store.commit('login');
                 closeModal();
             } else if (json.error) {

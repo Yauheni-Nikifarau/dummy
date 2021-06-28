@@ -67,6 +67,9 @@
             </div>
         </template>
         <template v-slot:footer>
+            <div class="alert alert-danger mb-3" v-show="errors.common.switch">
+                Something went wrong. Please, try again.
+            </div>
             <button class="btn btn-primary" @click.prevent="registerAttempt">Register</button>
         </template>
     </modal>
@@ -97,6 +100,7 @@ export default {
             email: {switch: false, text: ''},
             password: {switch: false, text: ''},
             birth: {switch: false, text: ''},
+            common: {switch: false, text: ''}
         });
         const closeModal = () => {
             emit("closeModal");
@@ -121,7 +125,8 @@ export default {
                     password_confirmation: credentials.confirmation,
                     birth: credentials.birth
                 })
-            });
+            }).catch(() => {errors.common.switch = true});
+            if(!response) return;
             const json = await response.json();
             if (json.access_token && json.token_type && json.expires_in) {
                 localStorage.setItem('authHeader', `${json.token_type} ${json.access_token}`);
@@ -135,6 +140,8 @@ export default {
                         errors[key].text = json.errors[key][0];
                     }
                 }
+            } else {
+                errors.common.switch = true;
             }
         }
         return {
