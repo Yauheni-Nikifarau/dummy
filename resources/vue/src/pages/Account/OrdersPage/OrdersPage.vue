@@ -24,59 +24,23 @@
 
 <script>
 import OrderListItem from "./OrderListItem";
+import {ref} from "vue";
 
 export default {
     setup() {
-        const orders = [
-            {
-                id: 192,
-                created_at: "12.12.2021 13:14:15",
-                price: 1950,
-                paid: true,
-                trip: {
-                    hotel: {
-                        country: "Cyprus",
-                        name: "The most popular hotel",
-                    },
+        const orders = ref([]);
+        const getOrders = async () => {
+            const authHeader = localStorage.getItem("authHeader");
+            const ordersUrl = process.env.VUE_APP_API_ROOT_PATH + '/api/orders';
+            const response = await fetch(ordersUrl, {
+                headers: {
+                    Authorization: authHeader,
                 },
-            },
-            {
-                id: 192,
-                created_at: "12.12.2021 13:14:15",
-                price: 1950,
-                paid: true,
-                trip: {
-                    hotel: {
-                        country: "Cyprus",
-                        name: "The most popular hotel",
-                    },
-                },
-            },
-            {
-                id: 192,
-                created_at: "12.12.2021 13:14:15",
-                price: 1950,
-                paid: true,
-                trip: {
-                    hotel: {
-                        country: "Cyprus",
-                        name: "The most popular hotel",
-                    },
-                },
-            },
-            {
-                id: 192,
-                created_at: "12.12.2021 13:14:15",
-                price: 1950,
-                paid: true,
-                trip: {
-                    hotel: {
-                        country: "Cyprus",
-                        name: "The most popular hotel",
-                    },
-                },
-            },
-        ];
+            });
+            const json = await response.json();
+            orders.value = json.data;
+        }
+        getOrders()
         return {
             orders,
         };

@@ -19,9 +19,11 @@ import SiteFooter from "../../components/SiteFooter";
 import LoginModal from "../../components/LoginModal";
 import RegisterModal from "../../components/RegisterModal";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 export default {
     setup() {
+        const router = useRouter();
         const modal = ref("none");
         const turnOnLoginModal = () => {
             modal.value = "login";
@@ -32,6 +34,10 @@ export default {
         const closeModal = () => {
             modal.value = "none";
         };
+        if (router.currentRoute.value.path == '/login') {
+            turnOnLoginModal();
+            history.pushState(null, "", '/');
+        }
         return {
             modal,
             turnOnLoginModal,

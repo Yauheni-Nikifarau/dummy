@@ -15,12 +15,13 @@ class Messages extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('from_id')->unsigned()->nullable();
+            $table->foreignId('from_id')->unsigned();
             $table->foreignId('to_id')->unsigned();
-            $table->string('subject')->nullable();
+            $table->foreignId('subject')->unsigned();
             $table->text('text')->nullable();
             $table->foreign('from_id')->references('id')->on('users');
             $table->foreign('to_id')->references('id')->on('users');
+            $table->foreign('subject')->references('id')->on('orders');
             $table->timestamps();
         });
     }

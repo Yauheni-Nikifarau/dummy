@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Resources\OrderResource;
+use App\Http\Resources\OrdersResource;
 use App\Http\Traits\ResponseHandler;
 use App\Mail\OrderReport;
 use App\Models\Order;
 use App\Models\Trip;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
@@ -27,17 +29,16 @@ class OrderController extends ApiController
      */
     public function index()
     {
+        $user_id = auth()->id();
         $resource = Order::with([
 
             'trip' => function (BelongsTo $query) {
                 $query->with(['hotel']);
-                },
+                }
 
-            'user'
+            ])->where('user_id', $user_id)->get();
 
-            ])->get();
-
-        return $this->responseSuccess(OrderResource::collection($resource));
+        return $this->responseSuccess(OrdersResource::collection($resource));
     }
 
     /**
@@ -80,6 +81,7 @@ class OrderController extends ApiController
             $order->paid                = false;
             $order->reservation_expires = $reservation_expires;
             $order->price               = $trip->price * (100 - ($trip->discount->value ?? 0)) / 100;
+            $order->admin_id            = User::where('role', 'admin')->where('id', '<>', $user_id)->inRandomOrder()->first()->id;
 
             $trip->update(['reservation' => true]);
             $order->save();
@@ -113,8 +115,6 @@ class OrderController extends ApiController
             'trip' => function (BelongsTo $query) {
                 $query->with(['hotel']);
                 },
-
-            'user'
 
             ])->find($id);
 
@@ -190,11 +190,13 @@ class OrderController extends ApiController
             $phpWord->save($fileFullPath, 'PDF');
         }
 
+        preg_match('/ordersReports.*/',$fileFullPath, $relativePath);
+
         if ($sendViaEmail == 'true') {
             Mail::to($user)->send(new OrderReport($fileFullPath, $extension));
             return $this->responseSuccess([], 'Check your email box');
         } else {
-            return Response::download($fileFullPath);
+            return $this->responseSuccess($relativePath);
         }
     }
 }

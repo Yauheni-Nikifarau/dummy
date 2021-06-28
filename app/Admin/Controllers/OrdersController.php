@@ -33,6 +33,9 @@ class OrdersController extends AdminController
         $grid->column('user', __('User'))->display(function () {
             return $this->user->name . ' ' . $this->user->surname . " ({$this->user->email})";
         });
+        $grid->column('admin', __('Admin'))->display(function () {
+            return $this->admin->name . ' ' . $this->admin->surname . " ({$this->admin->email})";
+        });
         $grid->column('paid', __('Paid'))->bool()->filter([
             0 => 'No',
             1 => 'Yes',

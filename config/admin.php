@@ -399,7 +399,7 @@ return [
         'summernote' => [
             'enable' => true,
             'config' => [
-                'lang'   => 'en-US',
+                'lang'   => 'ru-RU',
                 'height' => 300,
             ]
         ]

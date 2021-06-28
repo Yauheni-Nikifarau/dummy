@@ -16,14 +16,14 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
         $this->call(UserTableSeeder::class);
+        $this->call(HotelTableSeeder::class);
+        $this->call(HotelsLatLonSeeder::class);
         $this->call(DiscountsTableSeeder::class);
         $this->call(TagsTableSeeder::class);
-        $this->call(HotelTableSeeder::class);
-        $this->call(MessagesTableSeeder::class);
         $this->call(TripsTableSeeder::class);
         $this->call(TagsAssignsTableSeeder::class);
         $this->call(OrdersTableSeeder::class);
-        $this->call(HotelsLatLonSeeder::class);
+        $this->call(MessagesTableSeeder::class);
         $this->call(AdminTablesSeeder::class);
 
 

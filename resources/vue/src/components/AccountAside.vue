@@ -29,20 +29,32 @@
         </ul>
         <hr />
         <router-link to="/" class="nav-link link-dark">To site</router-link>
-        <router-link to="/" class="nav-link link-dark">Logout</router-link>
+        <router-link to="/" class="nav-link link-dark" @click.="logoutEvent">Logout</router-link>
     </aside>
 </template>
 
 <script>
+import {useRouter} from "vue-router";
+import {useStore} from "vuex";
+import {logout} from "../composables/useLogout";
+
 export default {
     setup() {
         const menu = [
             { link: "/account", title: "Me" },
             { link: "/account/orders", title: "My orders" },
-            { link: "/account/messages", title: "My messages" },
+            { link: "/account/conversations", title: "My messages" },
         ];
+        const router = useRouter();
+        const store = useStore();
+        const logoutEvent = () => {
+            logout();
+            store.commit('logout');
+            router.push({ path: '/' });
+        }
         return {
             menu,
+            logoutEvent
         };
     },
     name: "account-aside",

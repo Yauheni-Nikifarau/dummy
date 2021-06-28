@@ -53,14 +53,22 @@
                             <router-link
                                 class="nav-link hover:active"
                                 to="/account"
-                            >My account
+                                >My account
                             </router-link>
                         </li>
                     </ul>
-                    <button class="d-flex btn btn-outline-warning" @click.prevent="logout" v-if="store.state.auth">
+                    <button
+                        class="d-flex btn btn-outline-warning"
+                        @click.prevent="logoutEvent"
+                        v-if="store.state.auth"
+                    >
                         Logout
                     </button>
-                    <button class="d-flex btn btn-outline-success" @click.prevent="signInClickEvent" v-else>
+                    <button
+                        class="d-flex btn btn-outline-success"
+                        @click.prevent="signInClickEvent"
+                        v-else
+                    >
                         Sign in
                     </button>
                 </div>
@@ -71,27 +79,23 @@
 
 <script>
 import { useStore } from "vuex";
+import { logout } from "../composables/useLogout";
 
 export default {
-    setup (props, { emit }) {
+    setup(props, { emit }) {
         const store = useStore();
         const signInClickEvent = () => {
             emit("needLoginModal");
-        }
-        const logout = () => {
-            if (localStorage.getItem('authHeader')) {
-                localStorage.removeItem('authHeader');
-            }
-            if (localStorage.getItem('authHeaderExpire')) {
-                localStorage.removeItem(('authHeaderExpire'));
-            }
+        };
+        const logoutEvent = () => {
+            logout();
             store.commit('logout');
         }
         return {
             store,
             signInClickEvent,
-            logout
-        }
+            logoutEvent,
+        };
     },
     name: "site-header",
 };

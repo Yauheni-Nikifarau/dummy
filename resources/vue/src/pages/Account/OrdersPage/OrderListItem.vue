@@ -2,7 +2,7 @@
     <tr>
         <th scope="row">
             <router-link
-                :to="'/profile/order/' + order.id"
+                :to="'/account/orders/' + order.id"
                 class="list-group-item list-group-item-action"
                 >{{ order.id }}
             </router-link>
@@ -10,8 +10,8 @@
         <td>{{ order.created_at }}</td>
         <td>{{ order.price }}$</td>
         <td>{{ order.paid ? "yes" : "no" }}</td>
-        <td>{{ order.trip.hotel.country }}</td>
-        <td>{{ order.trip.hotel.name }}</td>
+        <td>{{ order.country }}</td>
+        <td>{{ order.hotel }}</td>
     </tr>
 </template>
 

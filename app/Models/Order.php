@@ -32,6 +32,26 @@ class Order extends Model
     }
 
     /**
+     * returns information about it's order admin
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin_id');
+    }
+
+    /**
+     * returns all messages dedicated to this order
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'subject');
+    }
+
+    /**
      * Create and save as docx file report about order
      *
      * @return string

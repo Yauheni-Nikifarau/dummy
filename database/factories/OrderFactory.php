@@ -33,6 +33,8 @@ class OrderFactory extends Factory
 //        }
         $paid = $this->faker->boolean();
 
+        $adminId = User::where('role', '=', 'admin')->inRandomOrder()->first()->id;
+
         //calculate price
         $trip = Trip::all()->find($tripId);
         $startPrice = $trip->price;
@@ -44,6 +46,7 @@ class OrderFactory extends Factory
         return [
             'trip_id' => $tripId,
             'user_id' => $userId,
+            'admin_id' => $adminId,
             'paid' => $paid,
             'price' => $price,
             'reservation_expires' => $reservation

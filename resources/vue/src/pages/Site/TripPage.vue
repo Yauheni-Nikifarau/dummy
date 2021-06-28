@@ -72,7 +72,6 @@ export default {
                 !authHeaderExpire ||
                 authHeaderExpire < Math.trunc(Date.now() / 1000)
             ) {
-                console.log(111);
                 emit('needLoginModal');
                 return;
             }
@@ -89,6 +88,7 @@ export default {
                 }),
             });
             const json = await response.json();
+            console.log(json);
             if (json.success === true) {
                 confirmOrder.value = true;
             }
