@@ -1,0 +1,31 @@
+version: '3.5'
+
+services:
+  laravel-app:
+    build:
+      context: '.'
+    container_name: laravel-app
+    volumes:
+      - .:/var/www/html
+    ports:
+      - 80:80
+
+  mysql-db:
+    image: mysql:5.7
+    container_name: mysql-db
+    volumes:
+      - ./run/var:/var/lib/mysql
+      - ./run/dump/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - MYSQL_ROOT_PASSWORD=securerootpassword
+      - MYSQL_DATABASE=dummy
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=liruna95
+    networks:
+      backend:
+        aliases:
+          - db
+
+networks:
+  backend:
+    name: backend-network
