@@ -17,7 +17,7 @@ class TagsTableSeeder extends Seeder
         Tag::create(['tag_name' => 'children']);
         Tag::create(['tag_name' => 'beach']);
         Tag::create(['tag_name' => 'rent auto']);
-        Tag::create(['tag_name' => 'spa']);
+        Tag::create(['tag_name' => 'hot tour']);
         Tag::create(['tag_name' => 'diving']);
         Tag::create(['tag_name' => 'surfing']);
         Tag::create(['tag_name' => 'bbq']);
