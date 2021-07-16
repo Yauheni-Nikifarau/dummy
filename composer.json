@@ -5,7 +5,7 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
-        "php": "^7.3|^8.0",
+        "php": "^7.3|^8.0|^7.4.3",
         "codingyu/ueditor": "^3.0",
         "doctrine/orm": "*",
         "dompdf/dompdf": "^1.0",
