@@ -8,21 +8,21 @@
             <div class="carousel-inner">
                 <div class="carousel-item active">
                     <img
-                        src="/img/firstslide.jpg"
+                        src="/vueAssets/img/firstslide.jpg"
                         class="d-block w-100"
                         alt="slide"
                     />
                 </div>
                 <div class="carousel-item">
                     <img
-                        src="/img/secondslide.jpg"
+                        src="/vueAssets/img/secondslide.jpg"
                         class="d-block w-100"
                         alt="slide"
                     />
                 </div>
                 <div class="carousel-item">
                     <img
-                        src="/img/thirdslide.jpeg"
+                        src="/vueAssets/img/thirdslide.jpeg"
                         class="d-block w-100"
                         alt="slide"
                     />
