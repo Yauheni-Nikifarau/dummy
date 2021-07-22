@@ -58,7 +58,7 @@ class Order extends Model
      */
     public function createReport ()
     {
-        $user = auth()->user();
+        $user = $this->user;
 
         $paid = $this->paid ? 'Yes' : 'No';
 

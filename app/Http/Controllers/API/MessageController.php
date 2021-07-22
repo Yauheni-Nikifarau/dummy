@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Requests\IndexMessageRequest;
 use App\Http\Resources\MessageListResource;
 use App\Http\Resources\MessageResource;
 use App\Mail\DialogueStart;

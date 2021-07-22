@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\OrdersResource;
 use App\Http\Traits\ResponseHandler;
+use App\Jobs\AfterOrderCreated;
 use App\Mail\OrderReport;
 use App\Models\Order;
 use App\Models\Trip;
@@ -87,6 +88,9 @@ class OrderController extends ApiController
             $order->save();
 
             DB::commit();
+
+            $job = new AfterOrderCreated($order);
+            $this->dispatch($job);
 
             return $this->responseSuccess([
                 'success' => true,
