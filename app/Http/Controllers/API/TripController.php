@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
 use App\Http\Resources\TripResource;
 use App\Models\Discount;
 use App\Models\Hotel;
 use App\Models\Tag;
 use App\Models\Trip;
 use Carbon\Carbon;
-use DB;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 
 class TripController extends ApiController
