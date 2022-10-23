@@ -1,6 +1,6 @@
 // vue.config.js
 
-process.env.VUE_APP_API_ROOT_PATH = 'http://dummy.local';
+process.env.VUE_APP_API_ROOT_PATH = 'http://trainee.local';
 
 /**
  * @type {import('@vue/cli-service').ProjectOptions}

@@ -49,7 +49,7 @@ export default {
             }
             const json = await response.json();
             hotelsList.value = json.data;
-            if (hotelsList.value.length) {
+            if ( ! hotelsList.value.length) {
                 error.value = true;
                 return;
             }
