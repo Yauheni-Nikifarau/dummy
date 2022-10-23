@@ -58,7 +58,6 @@ export default {
                 variable.empty = true;
             }
         };
-
         getTrips(latestListUrl, latestList);
         getTrips(hotListUrl, hotList);
         getTrips(offListUrl, offList);
