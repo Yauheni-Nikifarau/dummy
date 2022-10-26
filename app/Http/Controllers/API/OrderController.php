@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\OrdersResource;
 use App\Http\Traits\ResponseHandler;
 use App\Mail\OrderReport;
 use App\Models\Order;
-use App\Models\Trip;
 use App\Models\User;
+use App\Repositories\OrdersRepository;
+use App\Repositories\TripsRepository;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Response;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\Settings;
 
@@ -22,6 +22,16 @@ use PhpOffice\PhpWord\Settings;
 class OrderController extends ApiController
 {
     use ResponseHandler;
+
+    private OrdersRepository $ordersRepository;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->ordersRepository = app(OrdersRepository::class);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -29,35 +39,26 @@ class OrderController extends ApiController
      */
     public function index()
     {
-        $user_id = auth()->id();
-        $resource = Order::with([
+        $userId = auth()->id();
+        $orders = $this->ordersRepository->getOrdersForUserAllOrdersPage($userId);
 
-            'trip' => function (BelongsTo $query) {
-                $query->with(['hotel']);
-                }
-
-            ])->where('user_id', $user_id)->get();
-
-        return $this->responseSuccess(OrdersResource::collection($resource));
+        return $this->responseSuccess(OrdersResource::collection($orders));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
+     *
      * @return \Illuminate\Http\Response
      * @throws \Throwable
      */
-    public function store(Request $request)
+    public function store(StoreOrderRequest $request, TripsRepository $tripsRepository)
     {
-        $request->validate([
-            'trip_id' => 'required|int',
-        ]);
-
         $trip_id = $request->input('trip_id');
         $user_id = auth()->user()->id ?? null;
 
-        $trip = Trip::find($trip_id);
+        $trip = $tripsRepository->getTripForCheckReservation($trip_id);
 
         if ( ! $trip) {
             return $this->responseError('There is no trip with such id', 400);
@@ -68,7 +69,6 @@ class OrderController extends ApiController
         }
 
         $reservation_expires = Carbon::now()->addDays(3);
-
 
         try {
 
@@ -81,7 +81,8 @@ class OrderController extends ApiController
             $order->paid                = false;
             $order->reservation_expires = $reservation_expires;
             $order->price               = $trip->price * (100 - ($trip->discount->value ?? 0)) / 100;
-            $order->admin_id            = User::where('role', 'admin')->where('id', '<>', $user_id)->inRandomOrder()->first()->id;
+            $order->admin_id            = User::where('role', 'admin')->where('id', '<>',
+                $user_id)->inRandomOrder()->first()->id;
 
             $trip->update(['reservation' => true]);
             $order->save();
@@ -89,9 +90,8 @@ class OrderController extends ApiController
             DB::commit();
 
             return $this->responseSuccess([
-                'success' => true,
-                'message' => 'Your order confirmed',
-            ], '',201);
+                'success' => true, 'message' => 'Your order confirmed',
+            ], '', 201);
 
         } catch (\Exception $e) {
 
@@ -106,17 +106,12 @@ class OrderController extends ApiController
      * Display the specified resource.
      *
      * @param  int  $id
+     *
      * @return OrderResource|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id)
     {
-        $order = Order::with([
-
-            'trip' => function (BelongsTo $query) {
-                $query->with(['hotel']);
-                },
-
-            ])->find($id);
+        $order = $this->ordersRepository->getOrderForDetailsPage($id);
 
         if ($order && $order->user->id == auth()->id()) {
             return $this->responseSuccess(new OrderResource($order));
@@ -126,48 +121,20 @@ class OrderController extends ApiController
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
-
-    /**
      * Download or sends by email an order's report file in necessary extension
      *
-     * @param Request $request
+     * @param  Request  $request
      * @param $id
+     *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function report(Request $request, $id)
     {
         $user = auth()->user();
 
-        $order = Order::with([
-                    'trip' => function (BelongsTo $query) {
-                        $query->with(['hotel']);
-                    },
-                    'user'
-                ])->find($id);
+        $order = $this->ordersRepository->getOrderForBuildingReport($id);
 
-
-        if (!$order) {
+        if ( ! $order) {
             return $this->responseError('there is no trip with such id', 400);
         }
 
@@ -182,18 +149,19 @@ class OrderController extends ApiController
         $extension = $request->input('extension', 'docx');
 
         if ($extension == 'pdf') {
-            $phpWord = IOFactory::load($fileFullPath, 'Word2007');
-            $domPdfPath = base_path( 'vendor/dompdf/dompdf');
+            $phpWord    = IOFactory::load($fileFullPath, 'Word2007');
+            $domPdfPath = base_path('vendor/dompdf/dompdf');
             Settings::setPdfRendererPath($domPdfPath);
             Settings::setPdfRendererName('DomPDF');
             $fileFullPath = str_replace('.docx', '.pdf', $fileFullPath);
             $phpWord->save($fileFullPath, 'PDF');
         }
 
-        preg_match('/ordersReports.*/',$fileFullPath, $relativePath);
+        preg_match('/ordersReports.*/', $fileFullPath, $relativePath);
 
         if ($sendViaEmail == 'true') {
             Mail::to($user)->send(new OrderReport($fileFullPath, $extension));
+
             return $this->responseSuccess([], 'Check your email box');
         } else {
             return $this->responseSuccess($relativePath);

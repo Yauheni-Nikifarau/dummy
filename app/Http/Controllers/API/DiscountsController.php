@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Models\Discount;
-use Illuminate\Http\Request;
+use App\Repositories\DiscountsRepository;
 
 class DiscountsController extends ApiController
 {
-    public function index () {
-        return $this->responseSuccess(Discount::all());
+    public function index(DiscountsRepository $discountsRepository)
+    {
+        return $this->responseSuccess($discountsRepository->getAllDiscounts());
     }
 }

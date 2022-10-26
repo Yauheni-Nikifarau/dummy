@@ -2,15 +2,21 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
 use App\Http\Resources\HotelResource;
-use App\Models\Hotel;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Http\Request;
+use App\Repositories\HotelsRepository;
 
 class HotelController extends ApiController
 {
+
+    private HotelsRepository $hotelsRepository;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->hotelsRepository = app(HotelsRepository::class);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -19,81 +25,29 @@ class HotelController extends ApiController
     public function index()
     {
 
-        $resource = Hotel::with([
+        $hotels = $this->hotelsRepository->getAllHotels();
 
-            'trips'     => function (HasMany $query) {
-                $query->with(['tags', 'discount']);
-                },
+        $count = $this->hotelsRepository->countAllHotels();
 
-            'orders'    => function (HasManyThrough $query) {
-                $query->with(['user', 'trip']);
-                }
-
-            ])->paginate(9);
-
-        $count = Hotel::count();
-
-        return $this->responseSuccess(HotelResource::collection($resource), $count);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+        return $this->responseSuccess(HotelResource::collection($hotels), $count);
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int  $id
+     *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id)
     {
-        $resource = Hotel::with([
+        $hotel = $this->hotelsRepository->getHotelForShow($id);
 
-            'trips' => function (HasMany $query) {
-                $query->with(['tags', 'discount']);
-                },
-
-            'orders' => function (HasManyThrough $query) {
-                $query->with(['user', 'trip']);
-                }
-
-            ])->find($id);
-
-        if ($resource) {
-            return $this->responseSuccess(new HotelResource($resource));
+        if ($hotel) {
+            return $this->responseSuccess(new HotelResource($hotel));
         } else {
             return $this->responseError('There is no hotel with such id', 404);
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }
