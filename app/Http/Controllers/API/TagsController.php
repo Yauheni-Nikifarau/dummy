@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Models\Tag;
-use Illuminate\Http\Request;
+use App\Repositories\TagsRepository;
 
 class TagsController extends ApiController
 {
-    public function index () {
-        return $this->responseSuccess(Tag::all());
+    public function index(TagsRepository $tagsRepository)
+    {
+        return $this->responseSuccess($tagsRepository->getAllTags());
     }
 }
+
